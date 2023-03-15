@@ -1,0 +1,223 @@
+Bài 1: Cho mảng sau:
+let arr1 = [5, 1, 2, 10, 3, 0];
+Tìm phần tử lớn nhất trong mảng, làm bằng các cách khác nhau
+Giải:
+Cách 1:
+arr1.sort(function(a, b){
+    return b - a;
+}
+let maxNumber = arr1[0];
+Cách 2: 
+let maxNumber = Math.max(...arr1);
+
+Bài 2: Cho mảng sau
+let arr2 = [5, 1, 2, 10, 3, 0];
+Tìm phần tử nhỏ nhất trong mảng, làm bằng các cách khác nhau
+
+Bài 3: Viết hàm nhận vào một mảng, sau đó trả về phần tử lớn nhất trong mảng đó.
+
+Bài 4: Viết hàm nhận vào một mảng, sau đó trả về phần tử nhỏ nhất trong mảng đó.
+
+Bài 5: Cho mảng sau
+let arr5 = [
+    {
+        ten: "Tuan",
+        tuoi: 20,
+        tien: 20000,
+    },
+    {
+        ten: "Thu",
+        tuoi: 21,
+        tien: 30000,
+    },
+    {
+        ten: "Minh",
+        tuoi: 23,
+        tien: 50000
+    }
+]
+a, In ra tên của mỗi người trong mảng
+Giải:
+arr3.forEach(item => {
+    console.log(item.ten);
+})
+
+b, In ra tuổi của mỗi người trong mảng
+
+c, Tính tổng số tuổi của mảng
+Giải:
+let tongTuoi = 0;
+arr3.forEach(item => {
+    tongTuoi += item.tuoi;
+})
+
+d, Tính tổng số tiền của mảng
+
+e, Sắp xếp mảng tăng dần theo tuổi
+Giải:
+arr3.sort((a, b) => {
+    return a.tuoi - b.tuoi;
+})
+
+d, Sắp xếp mảng giảm dần theo tiền
+
+Bài 6: Cho mảng sau
+let arr6 = [
+    {
+        ten: "Tuan",
+        tuoi: 20,
+        tien: 20000,
+    },
+    {
+        ten: "Thu",
+        tuoi: 21,
+        tien: 30000,
+    },
+    {
+        ten: "Minh",
+        tuoi: 23,
+        tien: 50000
+    }
+]
+a, In ra tên của người có tuổi lớn nhất (Gợi ý cách làm: Đầu tiên sắp xếp mảng theo tuổi giảm dần, sau khi sắp xếp xong, người có tuổi lớn nhất sẽ nằm ở đầu mảng)
+b, In ra tên của người có tiền nhỏ nhất 
+
+Bài 7: Cho mảng sau
+let arr7 = [1, 5, 3, 6, 0]
+a, Thay đổi giá trị của phần tử thứ hai thành 15
+b, Thay đổi giá trị của phần tử cuối cùng thành 100
+c, Thêm phần tử 7 vào cuối mảng
+d, Thêm phần tử 10 vào đầu mảng
+f, Thêm mảng [8, 9, 10] vào cuối mảng
+g, Thêm mảng [9, 9, 9] vào đầu mảng
+i, Nối mảng trên với mảng [0, 0, 0] (Làm bằng các cách khác nhau: concat + toán tử trải rộng)
+
+Bài 8: Cho mảng sau
+let arr8 = [1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3];
+a, Phần tử 1 xuất hiện bao nhiêu lần
+b, Phần tử 3 xuất hiện bao nhiêu lần
+
+Bài 9: Cho mảng sau
+let arr9 = [
+    {
+        ten: "Tuan",
+        tuoi: 20,
+    },
+    {
+        ten: "Thu",
+        tuoi: 21,
+    {
+        ten: "Minh",
+        tuoi: 23,
+    }
+]
+a, Thay đổi tên của phần tử đầu tiên thành "Dam Anh Tuan"
+b, Thay đổi tuổi của phần tử thứ hai thành 22
+c, In ra tên của phần tử cuối cùng
+d, Thêm phần tử { ten: "Hanh", tuoi: 25 } vào cuối mảng
+
+Bài 10: Cho mảng sau
+let arr10 = [1, 3, 2, 'a', 'bb', 'ccc', 4, 5, 6, 7];
+a, Tính tổng các phần tử là số trong mảng (Làm bằng các cách khác nhau)
+Giải:
+Cách 1:
+let tong10 = 0;
+arr10.forEach((item) => {
+    if(typeof item === 'number'){
+        tong10 += item;
+    }
+})
+
+Cách 2:
+let tong11 = 0;
+arr10.filter((item) => {
+    if(typeof item ==== 'number'){
+        return true;
+    }
+}).forEach((item) => {
+    tong11 += item;
+})
+// Giải thích cách 2: Đầu tiên lọc các phần tử là số vào một mảng, sau đó tính tổng các phần tử trong mảng số vừa được tạo thành đó.
+b, Tính tổng các phần tử là số chẵn trong mảng (Làm bằng các cách khác nhau)
+Giải:
+Cách 1:
+let tongSoChan = 0;
+arr10.forEach(item => {
+    if(typeof item === 'number' && item % 2 === 0){
+        tongSoChan += item;
+    }
+})
+Cách 2:
+let tongSoChan1 = 0;
+arr10.filter(item => typeof item === 'number' && item % 2 === 0).forEach(item => {
+    tongSoChan1 += item;
+})
+
+c, Tính tổng các phần tử là số lẻ trong mảng
+
+d, Tính tổng các phần tử là số và chia hết cho 3 trong mảng
+
+e, Tạo mảng mới gồm các phần tử là số trong mảng
+
+f, Tạo mảng mới gồm các phần tử là string trong mảng
+
+Bài 11: Cho mảng sau
+let arr11 = ['11', '22', '33', '44'];
+a, Chuyển mảng trên thành mảng các số
+Giải:
+let result11 = arr11.map((item) => {
+    return Number(item);
+})
+b, Tính tổng các phần tử của mảng trên
+Giải:
+let tong111 = 0;
+arr11.forEach((item) => {
+    tong111 += Number(item);
+})
+
+Bài 12: Cho mảng sau
+let arr12 = [1, 2, 3, 4, 5];
+Chuyển mảng trên thành mảng các chuỗi
+Giải: 
+let result222 = arr12.map(item => String(item));
+
+Bài 13: Cho mảng sau 
+let arr13 = [55, 66, 77, 88]
+Chuyển mảng trên thành mảng các chuỗi
+
+Bài 14: Cho chuỗi sau
+let str14 = 'Dam Anh Tuan hoc Dai hoc Quoc gia Ha Noi";
+a, In ra độ dài của chuỗi
+b, Tạo chuỗi mới là chuỗi str14 được viết hoa
+c, Tạo chuỗi mới là chuỗi str14 được viết thường
+d, In ra chữ cái thứ 5 của chuỗi
+Giải:
+console.log(str14[4]);
+e, In ra chữ cái cuối cùng của chuỗi
+d, Tạo chuỗi mới được trích xuất từ chữ cái thứ 3 đến chữ cái thứ 10 của chuỗi
+Giải:
+let newStr1 = str14.substring(2, 10); // Giải thích: Sẽ trích xuất từ chữ cái thứ 3 (có index = 2) đến chữ cái thứ 10 (có index = 9), hàm substring này giống hàm slice trong mảng
+
+e, Tạo chuỗi mới được trích xuất từ chữ cái thứ 5 đến chữ cái thứ 11 của chuỗi
+
+f, Tạo chuỗi mới được trích xuất từ chữ cái thứ 10 đến hết chuỗi
+
+i, Tạo chuỗi mới được trích xuất từ chữ cái thứ 7 đến chữ cái thứ 14 của chuỗi
+
+g, Tạo chuỗi mới được trích xuất từ chữ cái thứ 4 của chuỗi và có độ dài là 7
+Giải:
+let newStr2 = str14.substr(3, 7); // Giải thích: Tham số thứ nhất là chỉ số bắt đầu, tham số thứ hai là độ dài cần lấy
+
+k, Tạo chuỗi mới được trích xuất từ chữ cái thứ 5 của chuỗi và có độ dài là 10
+
+l, Tạo chuỗi mới được trích xuất từ chữ cái thứ 10 của chuỗi và có độ dài là 5
+
+o, Nối chuỗi trên với chuỗi 'abc xyz'
+Giải:
+let newStr11 = str14.concat('abc xyz');
+
+p, Nối chuỗi trên với chuỗi 'xyz xyz';
+
+z, Nối chuỗi trên với chuỗi 'tuan' và chuỗi 'anh tuan';
+
+m, Nối chuỗi trên với chuỗi 'thu' và chuỗi 'van thu' và chuỗi 'nguyen van thu';
