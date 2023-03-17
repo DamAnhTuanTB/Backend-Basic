@@ -1,20 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const app = express();
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
-
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+
+const UserModel = require('./models/user');
+const auth = require('./middlewares/auth.js');
+const userRouters = require('./routers/user.js');
+
 mongoose.connect('mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority');
+
+const app = express();
 
 app.use(cookieParser());
 
 app.use('/congkhai', express.static(path.join(__dirname, './public')))
-
-const userRouters = require('./routers/user.js');
-
-const AccountModel = require('./models/account');
 
 // CORS middleware
 const allowCrossDomain = (req, res, next) => {
@@ -32,55 +33,53 @@ app.use(bodyParser.json());
 
 app.use(allowCrossDomain);
 
+app.use(express.json());
+
 // app.get('/', (req, res) => {
 //   let pathFile = path.join(__dirname, './page/home.html');
 //   res.sendFile(pathFile);
 // })
 
-app.post('/login', (req, res, next) => {
-  AccountModel.findOne({
-    username: req.body.username,
-    password: req.body.password
-  }).then(data => {
-    if (data) {
-      return res.json({
-        message: 'Thanh cong',
-        token: jwt.sign({
-          _id: data._id
-        }, 'mk')
-      });
-    } else {
-      return res.json('Sai ten dang nhap hoac mat khau');
-    }
-  }).catch(err => {
-    res.status(500).json("Loi server")
-  })
-})
-
-app.get('/private', (req, res, next) => {
-  try {
-    const token = req.cookies.token;
-    const ketqua = jwt.verify(token, 'mk');
-    if (ketqua) {
-      AccountModel.findOne({
-        _id: ketqua._id
-      }).then(data => {
-        res.data = data;
-        next();
-      }).catch(err => {
-        res.status(500).json('Khong tim thay nguoi dung');
-      })
-
-    }
-  } catch {
-    return res.redirect('/');
+app.post('/register', async (req, res) => {
+  const { email, telephone } = req.body;
+  const checkUnique = await UserModel.checkUniqueUser(email, telephone);
+  if (checkUnique) {
+    return res.status(400).send(checkUnique);
   }
-}, (req, res, next) => {
-  return res.json(res.data);
-})
+  req.body.password = await bcrypt.hash(req.body.password, 8);
+  UserModel.create(req.body).then(() => {
+    res.status(201).send({ message: "Tạo tài khoản thành công." })
+  }).catch(error => {
+    let errObject = {};
+    for (key in error.errors) {
+      errObject[key] = error.errors[key].message
+    }
+    res.status(400).send(errObject);
+  })
+});
+
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const user = await UserModel.findByCredentials(email, password);
+    const token = await user.generateAuthToken()
+    res.send({
+      user: {
+        id: user._id,
+        name: user.name,
+        telephone: user.telephone,
+        email: user.email,
+        date: user.date,
+        gender: user.gender
+      }, token
+    });
+  } catch (error) {
+    res.status(400).send({ message: error.message })
+  }
+});
 
 app.use('/user', userRouters);
 
 app.listen(process.env.PORT || 3000, () => {
 
-})
+});

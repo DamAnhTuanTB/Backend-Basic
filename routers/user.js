@@ -1,22 +1,14 @@
 const express = require('express');
+const auth = require('../middlewares/auth');
 
-const AccountModel = require('../models/account');
+const UserModel = require('../models/user');
 
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-    res.json('Hello');
-})
+router.use(auth);
 
-router.post('/', (req, res) => {
-    AccountModel.create({
-        username: req.body.username,
-        password: req.body.password
-    }).then(data => {
-        res.json('Tao thanh cong')
-    }).catch(err => {
-        res.status(500).json('Loi server')
-    })
+router.get('/', (req, res) => {
+    res.status(200).send(req.user);
 })
 
 module.exports = router;
