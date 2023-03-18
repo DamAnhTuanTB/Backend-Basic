@@ -41,36 +41,40 @@ app.use(express.json());
 // })
 
 app.post('/register', async (req, res) => {
-  const { email, telephone } = req.body;
-  const checkUnique = await UserModel.checkUniqueUser(email, telephone);
-  if (checkUnique) {
-    return res.status(400).send(checkUnique);
-  }
-  req.body.password = await bcrypt.hash(req.body.password, 8);
-  UserModel.create(req.body).then(() => {
-    res.status(201).send({ message: "Tạo tài khoản thành công." })
-  }).catch(error => {
-    let errObject = {};
-    for (key in error.errors) {
-      errObject[key] = error.errors[key].message
+  try {
+    let { name, date, email, password, telephone, gender } = req.body;
+    if (!name || !date || !email || !telephone || !gender || !password) {
+      return res.status(400).send({ message: "Vui lòng gửi đầy đủ thông tin." })
     }
-    res.status(400).send(errObject);
-  })
+    const checkUnique = await UserModel.checkUniqueUser(email, telephone);
+    if (checkUnique) {
+      return res.status(400).send(checkUnique);
+    }
+    req.body.password = await bcrypt.hash(req.body.password, 8);
+    UserModel.create(req.body).then(() => {
+      res.status(201).send({ message: "Tạo tài khoản thành công." })
+    }).catch(error => {
+      let errObject = {};
+      for (key in error.errors) {
+        errObject[key] = error.errors[key].message
+      }
+    })
+  } catch (error) {
+    res.status(500).send({ message: "Lỗi server" });
+  }
 });
 
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
+    if (!email || !password) {
+      return res.status(400).send({ message: "Vui lòng gửi đầy đủ thông tin." })
+    }
     const user = await UserModel.findByCredentials(email, password);
     const token = await user.generateAuthToken()
     res.send({
       user: {
-        id: user._id,
         name: user.name,
-        telephone: user.telephone,
-        email: user.email,
-        date: user.date,
-        gender: user.gender
       }, token
     });
   } catch (error) {

@@ -11,7 +11,7 @@ const auth = async (req, res, next) => {
             req.user = data;
             next();
         }).catch(err => {
-            res.status(500).json('Không tìm thấy người dùng.');
+            res.redirect('/login');
         })
     } catch (error) {
         // res.status(401).json({message: "Vui lòng đăng nhập để tiếp tục"});
