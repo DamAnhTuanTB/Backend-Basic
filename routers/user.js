@@ -14,8 +14,7 @@ router.get('/', (req, res) => {
         telephone: user.telephone,
         date: user.date,
         gender: user.gender,
-        address: user?.address,
-        identification: user?.identification,
+        address: user.address,
     }
     res.status(200).send({ user: objUser });
 })
@@ -26,7 +25,7 @@ router.put('/', (req, res) => {
     }
     UserModel.findOneAndUpdate({ _id: req.user._id }, req.body, { new: true })
         .then(data => {
-            res.status(200).send({ message: "Cập nhật thành công." })
+            res.status(200).send({ message: "Cập nhật thông tin cá nhân thành công." })
         })
         .catch(err => {
             res.status(500).send({ message: "Lỗi server." })

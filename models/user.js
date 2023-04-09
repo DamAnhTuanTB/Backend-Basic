@@ -44,13 +44,6 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ['male', 'female', 'other'],
         required: true
-    },
-    address: {
-        type: String,
-        required: true
-    },
-    identification: {
-        type: String
     }
 })
 

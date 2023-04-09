@@ -6,8 +6,11 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
 const UserModel = require('./models/user');
+const AddressModel = require('./models/address');
+
 const auth = require('./middlewares/auth.js');
 const userRouters = require('./routers/user.js');
+const addressRouters = require('./routers/address');
 
 mongoose.connect('mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority');
 
@@ -42,8 +45,8 @@ app.use(express.json());
 
 app.post('/register', async (req, res) => {
   try {
-    let { name, date, email, password, telephone, gender } = req.body;
-    if (!name || !date || !email || !telephone || !gender || !password) {
+    let { name, date, email, password, telephone, gender, address } = req.body;
+    if (!name || !date || !email || !telephone || !gender || !password || !address) {
       return res.status(400).send({ message: "Vui lòng gửi đầy đủ thông tin." })
     }
     const checkUnique = await UserModel.checkUniqueUser(email, telephone);
@@ -51,8 +54,17 @@ app.post('/register', async (req, res) => {
       return res.status(400).send(checkUnique);
     }
     req.body.password = await bcrypt.hash(req.body.password, 8);
-    UserModel.create(req.body).then(() => {
-      res.status(201).send({ message: "Tạo tài khoản thành công." })
+    UserModel.create(req.body).then((data) => {
+      AddressModel.create({
+        user: data._id,
+        address,
+        telephone,
+        name,
+        email,
+        isDefault: true
+      }).then(() => {
+        res.status(201).send({ message: "Tạo tài khoản thành công." })
+      })
     }).catch(error => {
       let errObject = {};
       for (key in error.errors) {
@@ -83,6 +95,8 @@ app.post('/login', async (req, res) => {
 });
 
 app.use('/user', userRouters);
+
+app.use('/address', addressRouters);
 
 app.listen(process.env.PORT || 3000, () => {
 
