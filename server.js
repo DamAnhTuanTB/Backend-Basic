@@ -11,7 +11,9 @@ const AddressModel = require('./models/address');
 const auth = require('./middlewares/auth.js');
 const userRouters = require('./routers/user.js');
 const addressRouters = require('./routers/address');
-
+const productRouters = require('./routers/product');
+const brandRouters = require('./routers/brand');
+const categoryRouters = require('./routers/category');
 mongoose.connect('mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority');
 
 const app = express();
@@ -97,6 +99,12 @@ app.post('/login', async (req, res) => {
 app.use('/user', userRouters);
 
 app.use('/address', addressRouters);
+
+app.use('/product', productRouters);
+
+app.use('/brand', brandRouters);
+
+app.use('/category', categoryRouters);
 
 app.listen(process.env.PORT || 3000, () => {
 
