@@ -8,7 +8,7 @@ const router = express.Router();
 const brand = [
   {
     id: 1,
-    image: "https://shop.30shine.com/thuong-hieu/nerman",
+    image: "https://static.30shine.com/shop-admin/2023/01/03/30SD1L10-b2a8049d1917eff484ec1022f298d9d6_tn.jpg",
     name: "Nerman"
   },
   {
@@ -38,7 +38,7 @@ const brand = [
   },
   {
     id: 7,
-    image: "https://shop.30shine.com/thuong-hieu/nerman",
+    image: "https://static.30shine.com/shop-admin/2023/01/03/30SD1L10-b2a8049d1917eff484ec1022f298d9d6_tn.jpg",
     name: "Nerman"
   },
   {

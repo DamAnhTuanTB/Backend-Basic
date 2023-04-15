@@ -8,8 +8,25 @@ const router = express.Router();
 // router.use(auth);
 
 router.get('/', async (req, res) => {
-  let query = req.query;
-  const products = await ProductModel.find().populate('category').populate('brand');
+
+  let { keyword, minPrice, maxPrice, brands, category } = req.query;
+
+  const products = await ProductModel.find({
+    name: !!keyword ? { $regex: keyword, $options: 'i' } : {},
+    salePrice: { $gte: minPrice ? Number(minPrice) : 0, $lte: maxPrice ? Number(maxPrice) : 999999999999 },
+  }).populate({
+    path: 'brand',
+    match: brands?.length > 0 ? {
+      _id: { $in: brands }
+    } : {}
+  }).populate({
+    path: 'category',
+    match: !!category ? {
+      _id: category
+    } : {}
+  });
+
+  console.log(products);
   res.status(200).send({
     data: products
   })
