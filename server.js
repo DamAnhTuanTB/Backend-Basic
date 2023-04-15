@@ -14,6 +14,8 @@ const addressRouters = require('./routers/address');
 const productRouters = require('./routers/product');
 const brandRouters = require('./routers/brand');
 const categoryRouters = require('./routers/category');
+const blogRouters = require('./routers/blog');
+
 mongoose.connect('mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority');
 
 const app = express();
@@ -105,6 +107,8 @@ app.use('/product', productRouters);
 app.use('/brand', brandRouters);
 
 app.use('/category', categoryRouters);
+
+app.use('/blog', blogRouters);
 
 app.listen(process.env.PORT || 3000, () => {
 

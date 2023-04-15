@@ -7,15 +7,11 @@ const router = express.Router();
 
 // router.use(auth);
 
-router.get('/', (req, res) => {
-  ProductModel.find().populate('category').populate('brand').then(data => {
-    res.status(200).send({
-      data
-    })
-  }).catch(err => {
-    res.status(500).send({
-      message: "Lỗi server"
-    })
+router.get('/', async (req, res) => {
+  let query = req.query;
+  const products = await ProductModel.find().populate('category').populate('brand');
+  res.status(200).send({
+    data: products
   })
 })
 
