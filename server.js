@@ -8,13 +8,13 @@ const mongoose = require('mongoose');
 const UserModel = require('./models/user');
 const AddressModel = require('./models/address');
 
-const auth = require('./middlewares/auth.js');
 const userRouters = require('./routers/user.js');
 const addressRouters = require('./routers/address');
 const productRouters = require('./routers/product');
 const brandRouters = require('./routers/brand');
 const categoryRouters = require('./routers/category');
 const blogRouters = require('./routers/blog');
+const evaluateRouters = require('./routers/evaluate')
 
 mongoose.connect('mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority');
 
@@ -49,8 +49,8 @@ app.use(express.json());
 
 app.post('/register', async (req, res) => {
   try {
-    let { name, date, email, password, telephone, gender, address } = req.body;
-    if (!name || !date || !email || !telephone || !gender || !password || !address) {
+    let { name, date, email, password, telephone, gender } = req.body;
+    if (!name || !date || !email || !telephone || !gender || !password) {
       return res.status(400).send({ message: "Vui lòng gửi đầy đủ thông tin." })
     }
     const checkUnique = await UserModel.checkUniqueUser(email, telephone);
@@ -58,17 +58,8 @@ app.post('/register', async (req, res) => {
       return res.status(400).send(checkUnique);
     }
     req.body.password = await bcrypt.hash(req.body.password, 8);
-    UserModel.create(req.body).then((data) => {
-      AddressModel.create({
-        user: data._id,
-        address,
-        telephone,
-        name,
-        email,
-        isDefault: true
-      }).then(() => {
-        res.status(201).send({ message: "Tạo tài khoản thành công." })
-      })
+    UserModel.create(req.body).then(() => {
+      res.status(201).send({ message: "Tạo tài khoản thành công." })
     }).catch(error => {
       let errObject = {};
       for (key in error.errors) {
@@ -109,6 +100,8 @@ app.use('/brand', brandRouters);
 app.use('/category', categoryRouters);
 
 app.use('/blog', blogRouters);
+
+app.use('/evaluate', evaluateRouters);
 
 app.listen(process.env.PORT || 3000, () => {
 
