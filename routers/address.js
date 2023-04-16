@@ -5,7 +5,7 @@ const AddressModel = require('../models/address');
 
 const router = express.Router();
 
-router.use(auth);
+// router.use(auth);
 
 router.get('/', (req, res) => {
   AddressModel.find({ user: req.user._id }).then(data =>

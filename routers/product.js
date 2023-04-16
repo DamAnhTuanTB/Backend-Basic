@@ -98,6 +98,37 @@ router.get('/:id', async (req, res) => {
     }
   ]);
 
+  const evaluates = await EvaluateModel.find({ product: new mongoose.Types.ObjectId(id) });
+
+  let oneStar = 0;
+  let twoStar = 0;
+  let threeStar = 0;
+  let fourStar = 0;
+  let fiveStar = 0;
+
+  evaluates.forEach(e => {
+    switch (Number(e.numberStar)) {
+      case 1:
+        oneStar++;
+        break;
+      case 2:
+        twoStar++;
+        break;
+      case 3:
+        threeStar++;
+        break;
+      case 4:
+        fourStar++;
+        break;
+      case 5:
+        fiveStar++;
+        break
+      default:
+        break;
+    }
+  })
+
+
   res.status(200).send({
     data: {
       id: productDetail._id,
@@ -108,7 +139,14 @@ router.get('/:id', async (req, res) => {
       information: productDetail.information,
       manual: productDetail.manual,
       totalEvaluate: evaluateProduct?.length > 0 ? evaluateProduct[0].totalEvaluate : 0,
-      star: evaluateProduct.length > 0 ? Math.floor(Number(evaluateProduct[0].totalStar) / Number(evaluateProduct[0].totalEvaluate)) : 0
+      star: evaluateProduct.length > 0 ? Math.floor(Number(evaluateProduct[0].totalStar) / Number(evaluateProduct[0].totalEvaluate)) : 0,
+      listStar: {
+        oneStar,
+        twoStar,
+        threeStar,
+        fourStar,
+        fiveStar
+      }
     }
   })
 })

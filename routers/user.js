@@ -5,16 +5,15 @@ const UserModel = require('../models/user');
 
 const router = express.Router();
 
-router.use(auth);
+// router.use(auth);
 
 router.get('/', (req, res) => {
     let user = req.user;
     let objUser = {
         name: user.name,
         telephone: user.telephone,
-        date: user.date,
-        gender: user.gender,
-        address: user.address,
+        email: user.email,
+        date: user.date
     }
     res.status(200).send({ user: objUser });
 })
