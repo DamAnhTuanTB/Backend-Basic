@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
 
-  let { keyword, minPrice, maxPrice, brands, category } = req.query;
+  let { keyword, minPrice, maxPrice, brands, category, sort } = req.query;
 
   const queryProduct = {
     salePrice: { $gte: minPrice ? Number(minPrice) : 0, $lte: maxPrice ? Number(maxPrice) : 999999999999 }
@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
     }
   }
 
-  const products = await ProductModel.find(queryProduct).populate(queryCategory);
+  const products = (await ProductModel.find(queryProduct).populate(queryCategory)).filter(item => !!item.category);
 
   const responseProducts = products.map(product => ({
     id: product._id,
@@ -75,6 +75,14 @@ router.get('/', async (req, res) => {
     }
     return product
   })
+
+  if (sort) {
+    if (Number(sort) === 0) {
+      result.sort((a, b) => a.salePrice - b.salePrice)
+    } else if (Number(sort) === 1) {
+      result.sort((a, b) => b.salePrice - a.salePrice)
+    }
+  }
 
   res.status(200).send({
     data: result
