@@ -9,6 +9,7 @@ const router = express.Router();
 // router.use(auth);
 
 router.get('/:id', (req, res) => {
+  
   let idProduct = req.params.id;
   EvaluateModel.find({ product: idProduct }).populate('user').then((data) => {
     res.status(200).send({
