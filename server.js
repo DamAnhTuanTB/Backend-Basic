@@ -23,6 +23,8 @@ const app = express();
 
 app.use(cookieParser());
 
+
+
 app.use('/congkhai', express.static(path.join(__dirname, './public')))
 
 // CORS middleware
