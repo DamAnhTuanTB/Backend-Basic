@@ -159,6 +159,60 @@ router.get('/:id', async (req, res) => {
   })
 })
 
+router.get('/relate/:id', async (req, res) => {
+
+  let id = req.params.id;
+
+  const productDetail = await ProductModel.findById(id);
+
+  const queryCategory = {
+    path: 'category',
+    match: {
+      _id: productDetail.category
+    }
+  }
+
+  const products = (await ProductModel.find().populate(queryCategory)).filter(item => !!item.category);
+
+  const responseProducts = products.map(product => ({
+    id: product._id,
+    name: product.name,
+    salePrice: product.salePrice,
+    originPrice: product.originPrice,
+    image: product.images[0]
+  }))
+
+  const productIds = products.map((product) => product._id);
+
+  const evaluateProducts = await EvaluateModel.aggregate([
+    {
+      $match: { product: { $in: productIds } }
+    },
+    {
+      $group: {
+        _id: "$product",
+        totalEvaluate: { $sum: 1 },
+        totalStar: { $sum: '$numberStar' }
+      }
+    }
+  ]);
+
+  let result = responseProducts.map(product => {
+    let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
+    if (evaluateItem) {
+      product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
+    } else {
+      product.star = 0
+    }
+    return product
+  })
+
+  res.status(200).send({
+    data: result
+  })
+})
+
+
 router.post('/', (req, res) => {
   ProductModel.create(req.body).then(data => {
     res.status(201).send({
