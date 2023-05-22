@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser')
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const UserModel = require('./models/user');
 const AddressModel = require('./models/address');
@@ -25,17 +26,19 @@ const app = express();
 
 app.use(cookieParser());
 
+app.use(cors());
+
 
 
 app.use('/congkhai', express.static(path.join(__dirname, './public')))
 
 // CORS middleware
-const allowCrossDomain = (req, res, next) => {
-  res.header(`Access-Control-Allow-Origin`, `*`);
-  res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
-  res.header(`Access-Control-Allow-Headers`, `Content-Type`);
-  next();
-};
+// const allowCrossDomain = (req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   next();
+// };
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -43,7 +46,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json());
 
-app.use(allowCrossDomain);
+// app.use(allowCrossDomain);
 
 app.use(express.json());
 

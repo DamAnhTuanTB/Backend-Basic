@@ -11,11 +11,11 @@ const auth = async (req, res, next) => {
             req.user = data;
             next();
         }).catch(err => {
-            res.redirect('/login');
+            res.status(401).json({ message: "Vui lòng đăng nhập để tiếp tục" });
         })
     } catch (error) {
         // res.status(401).json({message: "Vui lòng đăng nhập để tiếp tục"});
-        res.redirect('/login');
+        res.status(401).json({ message: "Vui lòng đăng nhập để tiếp tục" });
     }
 }
 

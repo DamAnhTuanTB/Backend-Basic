@@ -8,7 +8,7 @@ const EvaluateModel = require('../models/evaluate');
 
 const router = express.Router();
 
-// router.use(auth);
+router.use(auth);
 
 router.get('/', async (req, res) => {
 
@@ -91,125 +91,140 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   let { id } = req.params;
-  let productDetail = await ProductModel.findOne({ _id: id }).populate("category");
+  try {
+    let productDetail = await ProductModel.findOne({ _id: id }).populate("category");
 
-  const evaluateProduct = await EvaluateModel.aggregate([
-    {
-      $match: { product: new mongoose.Types.ObjectId(id) }
-    },
-    {
-      $group: {
-        _id: "$product",
-        totalEvaluate: { $sum: 1 },
-        totalStar: { $sum: '$numberStar' }
+    const evaluateProduct = await EvaluateModel.aggregate([
+      {
+        $match: { product: new mongoose.Types.ObjectId(id) }
+      },
+      {
+        $group: {
+          _id: "$product",
+          totalEvaluate: { $sum: 1 },
+          totalStar: { $sum: '$numberStar' }
+        }
       }
-    }
-  ]);
+    ]);
 
-  const evaluates = await EvaluateModel.find({ product: new mongoose.Types.ObjectId(id) });
+    const evaluates = await EvaluateModel.find({ product: new mongoose.Types.ObjectId(id) });
 
-  let oneStar = 0;
-  let twoStar = 0;
-  let threeStar = 0;
-  let fourStar = 0;
-  let fiveStar = 0;
+    let oneStar = 0;
+    let twoStar = 0;
+    let threeStar = 0;
+    let fourStar = 0;
+    let fiveStar = 0;
 
-  evaluates.forEach(e => {
-    switch (Number(e.numberStar)) {
-      case 1:
-        oneStar++;
-        break;
-      case 2:
-        twoStar++;
-        break;
-      case 3:
-        threeStar++;
-        break;
-      case 4:
-        fourStar++;
-        break;
-      case 5:
-        fiveStar++;
-        break
-      default:
-        break;
-    }
-  })
-
-
-  res.status(200).send({
-    data: {
-      id: productDetail._id,
-      name: productDetail.name,
-      images: productDetail.images,
-      salePrice: productDetail.salePrice,
-      originPrice: productDetail.originPrice,
-      information: productDetail.information,
-      manual: productDetail.manual,
-      totalEvaluate: evaluateProduct?.length > 0 ? evaluateProduct[0].totalEvaluate : 0,
-      star: evaluateProduct.length > 0 ? Math.floor(Number(evaluateProduct[0].totalStar) / Number(evaluateProduct[0].totalEvaluate)) : 0,
-      listStar: {
-        oneStar,
-        twoStar,
-        threeStar,
-        fourStar,
-        fiveStar
+    evaluates.forEach(e => {
+      switch (Number(e.numberStar)) {
+        case 1:
+          oneStar++;
+          break;
+        case 2:
+          twoStar++;
+          break;
+        case 3:
+          threeStar++;
+          break;
+        case 4:
+          fourStar++;
+          break;
+        case 5:
+          fiveStar++;
+          break
+        default:
+          break;
       }
-    }
-  })
+    })
+
+
+    res.status(200).send({
+      data: {
+        id: productDetail._id,
+        name: productDetail.name,
+        images: productDetail.images,
+        salePrice: productDetail.salePrice,
+        originPrice: productDetail.originPrice,
+        information: productDetail.information,
+        manual: productDetail.manual,
+        totalEvaluate: evaluateProduct?.length > 0 ? evaluateProduct[0].totalEvaluate : 0,
+        star: evaluateProduct.length > 0 ? Math.floor(Number(evaluateProduct[0].totalStar) / Number(evaluateProduct[0].totalEvaluate)) : 0,
+        listStar: {
+          oneStar,
+          twoStar,
+          threeStar,
+          fourStar,
+          fiveStar
+        }
+      }
+    })
+  }
+  catch (error) {
+    res.status(500).send({
+      message: "Lỗi server"
+    })
+  }
 })
 
 router.get('/relate/:id', async (req, res) => {
 
   let id = req.params.id;
+  try {
 
-  const productDetail = await ProductModel.findById(id);
 
-  const queryCategory = {
-    path: 'category',
-    match: {
-      _id: productDetail.category
-    }
-  }
+    const productDetail = await ProductModel.findById(id);
 
-  const products = (await ProductModel.find().populate(queryCategory)).filter(item => !!item.category);
-
-  const responseProducts = products.map(product => ({
-    id: product._id,
-    name: product.name,
-    salePrice: product.salePrice,
-    originPrice: product.originPrice,
-    image: product.images[0]
-  }))
-
-  const productIds = products.map((product) => product._id);
-
-  const evaluateProducts = await EvaluateModel.aggregate([
-    {
-      $match: { product: { $in: productIds } }
-    },
-    {
-      $group: {
-        _id: "$product",
-        totalEvaluate: { $sum: 1 },
-        totalStar: { $sum: '$numberStar' }
+    const queryCategory = {
+      path: 'category',
+      match: {
+        _id: productDetail.category
       }
     }
-  ]);
 
-  let result = responseProducts.map(product => {
-    let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
-    if (evaluateItem) {
-      product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
-    } else {
-      product.star = 0
-    }
-    return product
-  })
+    const products = (await ProductModel.find().populate(queryCategory)).filter(item => !!item.category);
 
-  res.status(200).send({
-    data: result
-  })
+    const responseProducts = products.map(product => ({
+      id: product._id,
+      name: product.name,
+      salePrice: product.salePrice,
+      originPrice: product.originPrice,
+      image: product.images[0]
+    }))
+
+    const productIds = products.map((product) => product._id);
+
+    const evaluateProducts = await EvaluateModel.aggregate([
+      {
+        $match: { product: { $in: productIds } }
+      },
+      {
+        $group: {
+          _id: "$product",
+          totalEvaluate: { $sum: 1 },
+          totalStar: { $sum: '$numberStar' }
+        }
+      }
+    ]);
+
+    let result = responseProducts.map(product => {
+      let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
+      if (evaluateItem) {
+        product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
+      } else {
+        product.star = 0
+      }
+      return product
+    })
+
+    res.status(200).send({
+      data: result
+    })
+  }
+  catch (error) {
+    res.status(500).send({
+      message: "Lỗi server"
+    })
+  }
 })
 
 
