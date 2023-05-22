@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser')
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const cors = require('cors');
+// const cors = require('cors');
 
 const UserModel = require('./models/user');
 const AddressModel = require('./models/address');
@@ -19,14 +19,11 @@ const evaluateRouters = require('./routers/evaluate')
 
 mongoose.connect('mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority');
 
-
-
-
 const app = express();
 
 app.use(cookieParser());
 
-app.use(cors());
+// app.use(cors());
 
 
 
