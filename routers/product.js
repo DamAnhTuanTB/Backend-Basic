@@ -170,8 +170,6 @@ router.get('/relate/:id', async (req, res) => {
 
   let id = req.params.id;
   try {
-
-
     const productDetail = await ProductModel.findById(id);
 
     const queryCategory = {

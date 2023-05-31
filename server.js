@@ -16,6 +16,7 @@ const brandRouters = require("./routers/brand");
 const categoryRouters = require("./routers/category");
 const blogRouters = require("./routers/blog");
 const evaluateRouters = require("./routers/evaluate");
+const cartRouters = require("./routers/cart");
 
 mongoose.connect(
   "mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority"
@@ -113,5 +114,7 @@ app.use("/category", categoryRouters);
 app.use("/blog", blogRouters);
 
 app.use("/evaluate", evaluateRouters);
+
+app.use("/cart", cartRouters);
 
 app.listen(process.env.PORT || 3030, () => {});
