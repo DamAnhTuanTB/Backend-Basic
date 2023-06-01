@@ -12,89 +12,106 @@ const router = express.Router();
 router.use(auth);
 
 router.get('/:id', async (req, res) => {
-  const payment = await PaymentModel.findById(req.params.id);
-  res.status(200).send({
-    products: payment.products.map((product) => ({
-      id: product.id,
-      image: product.image,
-      name: product.name,
-      amount: product.amount,
-      price: product.price
-    })),
-    totalOriginPrice: payment.totalOriginPrice,
-    deliveryPrice: payment.deliveryPrice,
-    totalPrice: payment.totalPrice
-  })
+  try{
+    const payment = await PaymentModel.findById(req.params.id);
+    res.status(200).send({
+     data: {
+       products: payment.products.map((product) => ({
+        id: product.id,
+        image: product.image,
+        name: product.name,
+        amount: product.amount,
+        price: product.price
+      })),
+      totalOriginPrice: payment.totalOriginPrice,
+      deliveryPrice: payment.deliveryPrice,
+      totalPrice: payment.totalPrice
+     }
+    })
+  }catch(error){
+    res.status(500).send({
+      message: 'Lỗi server'
+    })
+  }
 })
 
 router.post('/order', async (req, res) => {
-  const listId = req.body.listId;
+  try{
+    const listCartId = req.body.listCartId;
 
-  const products = [];
+    console.log(listCartId);
 
-  let totalOriginPrice = 0; 
+    const products = [];
 
-  listId.forEach( async (id, index) => {
-    const cart = await CartModel.findOne({_id: id}).populate("product");
+    let totalOriginPrice = 0; 
 
-    totalOriginPrice += cart.product.salePrice * cart.amount;
-    products.push({
-      id: cart.product._id,
-      name: cart.product.name,
-      image: cart.product.images[0],
-      amount: cart.amount,
-      price: cart.product.salePrice
+    listCartId.forEach( async (id, index) => {
+      const cart = await CartModel.findOne({_id: id}).populate("product");
+
+      totalOriginPrice += cart.product.salePrice * cart.amount;
+      products.push({
+        id: cart.product._id,
+        name: cart.product.name,
+        image: cart.product.images[0],
+        amount: cart.amount,
+        price: cart.product.salePrice
+      })
+
+      if(index === listCartId.length - 1){
+        const newOrder = await PaymentModel.create({
+          user: req.user._id,
+          products,
+          totalOriginPrice,
+          deliveryPrice: 30000,
+          totalPrice: totalOriginPrice + 30000,
+          timeUpdate: new Date()
+        })
+
+        res.status(201).send({
+          paymentId: newOrder._id
+        })
+      }
     })
-
-    if(index === listId.length - 1){
-      const newOrder = await PaymentModel.create({
-        user: req.user._id,
-        products,
-        totalOriginPrice,
-        deliveryPrice: 30000,
-        totalPrice: totalOriginPrice + 30000,
-        timeUpdate: new Date()
-      })
-
-      res.status(201).send({
-        orderId: newOrder._id
-      })
-    }
-  })
+  }catch(error){
+    res.status(500).send({
+      message: 'Lỗi server'
+    })
+  }
+ 
 })
 
 router.post("/buy-now", async (req, res) => {
-  const { id, amount } = req.body;
+  try{
+    const { id, amount } = req.body;
 
-  const product = await ProductModel.findById(id);
+    const product = await ProductModel.findById(id);
 
-  const newOrder = await PaymentModel.create({
-    user: req.user._id,
-    products: [
-      {
-        id: product._id,
-        name: product.name,
-        image: product.images[0],
-        amount,
-        price: product.salePrice
-      }
-    ],
-    totalOriginPrice: product.salePrice * amount,
-    deliveryPrice: 30000,
-    totalPrice: product.salePrice * amount + 30000,
-    timeUpdate: new Date()
-  })
+    const newOrder = await PaymentModel.create({
+      user: req.user._id,
+      products: [
+        {
+          id: product._id,
+          name: product.name,
+          image: product.images[0],
+          amount,
+          price: product.salePrice
+        }
+      ],
+      totalOriginPrice: product.salePrice * amount,
+      deliveryPrice: 30000,
+      totalPrice: product.salePrice * amount + 30000,
+      timeUpdate: new Date()
+    })
 
-  res.status(201).send({
-    orderId: newOrder._id
-  })
+    res.status(201).send({
+      paymentId: newOrder._id
+    })
+  }catch(err){
+    res.status(500).send({
+      message: 'Lỗi server'
+    })
+  }
 
-});
-
-router.get("/", (req, res) => {
-  res.status(200).send({
-    brand,
-  });
 });
 
 module.exports = router;
