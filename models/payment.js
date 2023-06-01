@@ -4,23 +4,23 @@ const paymentSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
   },
-  products: [Object],
+  products: [
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
+      name: String,
+      image: String,
+      amount: Number,
+      price: Number,
+    }
+  ],
   totalOriginPrice: Number,
   deliveryPrice: Number,
   totalPrice: Number,
-  methodPayment: {
-    type: String,
-    enum: ["payment_offline", "payment_online"],
-  },
-  name: String,
-  quantity: Number,
-  originPrice: Number,
-  salePrice: Number,
-  information: [String],
-  manual: [String],
-  images: [String],
+  timeUpdate: Date
 });
 
-const ProductModel = mongoose.model("product", productSchema);
+const ProductModel = mongoose.model("payment", paymentSchema);
 
 module.exports = ProductModel;
