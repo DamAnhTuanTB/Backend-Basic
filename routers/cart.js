@@ -54,7 +54,7 @@ router.post("/add-cart", async (req, res) => {
       );
     }
 
-    const listCart = await CartModel.find();
+    const listCart = await CartModel.find({ user: req.user._id });
 
     res.status(201).send({ totalCart: listCart.length });
   } catch (err) {
