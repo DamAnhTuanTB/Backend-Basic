@@ -9,7 +9,7 @@ const timelineSchema = mongoose.Schema({
     enum: ['processing', 'in_transit', 'delivered', 'canceled'],
     required: true
   },
-  time: Date
+  timeUpdate: Date
 })
 
 const TimelineModel = mongoose.model('timeline', timelineSchema);

@@ -4,26 +4,40 @@ const orderSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'product'
-  },
+  products: [
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
+      name: String,
+      image: String,
+      amount: Number,
+      price: Number,
+    }
+  ],
+  totalOriginPrice: Number,
+  deliveryPrice: Number,
+  totalPrice: Number,
   address: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'address'
+    name: String,
+    email: String,
+    phone: String,
+    detailAddress: String
   },
-  voucher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'voucher'
+  methodPayment: {
+    type: String,
+    enum: ['offline', 'online'],
   },
-  amount: Number,
-  totalMoney: Number,
   status: {
     type: String,
     enum: ['processing', 'in_transit', 'delivered', 'canceled'],
-    required: true
   },
-  time: Date
+  timeDelivery: {
+    type: Number,
+    enum: [1, 2, 3]
+  },
+  noteOrder: String,
+  timeUpdate: Date
 })
 
 const OrderModel = mongoose.model('order', orderSchema);
