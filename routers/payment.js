@@ -39,7 +39,7 @@ router.post('/order', async (req, res) => {
   try{
     const listCartId = req.body.listCartId;
 
-    console.log(listCartId);
+    console.log('listCart', listCartId);
 
     const products = [];
 
@@ -64,7 +64,8 @@ router.post('/order', async (req, res) => {
           totalOriginPrice,
           deliveryPrice: 30000,
           totalPrice: totalOriginPrice + 30000,
-          timeUpdate: new Date()
+          timeUpdate: new Date(),
+          listCartId
         })
 
         res.status(201).send({
