@@ -59,7 +59,7 @@ router.post("/", (req, res) => {
 router.put("/:id", (req, res) => {
   const id = req.params.id;
   const data = req.body;
-  AddressModel.findOneAndUpdate({ _id: id }, data)
+  AddressModel.findOneAndUpdate({ _id: id, user: req.user._id }, data)
     .then(() => {
       res.status(200).send({ message: "Cập nhật thành công." });
     })
