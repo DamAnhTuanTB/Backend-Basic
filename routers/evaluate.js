@@ -6,7 +6,7 @@ const EvaluateModel = require('../models/evaluate');
 
 const router = express.Router();
 
-// router.use(auth);
+router.use(auth);
 
 router.get('/:id', (req, res) => {
   
@@ -28,6 +28,7 @@ router.get('/:id', (req, res) => {
 router.post('/', async (req, res) => {
   EvaluateModel.create({
     ...req.body,
+    time: new Date(),
     user: req.user._id
   }).then(data => {
     res.status(200).send({

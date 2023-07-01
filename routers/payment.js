@@ -39,8 +39,6 @@ router.post('/order', async (req, res) => {
   try{
     const listCartId = req.body.listCartId;
 
-    console.log('listCart', listCartId);
-
     const products = [];
 
     let totalOriginPrice = 0; 

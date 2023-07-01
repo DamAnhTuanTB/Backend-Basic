@@ -42,8 +42,6 @@ router.post('/', async (req, res) => {
       } = req.body;
       const payment = await PaymentModel.findById(paymentId);
 
-      console.log('listCartId', payment.listCartId);
-
       payment.listCartId.forEach(async (cartId) => {
         await CartModel.deleteOne({_id: cartId})
       })

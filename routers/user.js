@@ -5,7 +5,7 @@ const UserModel = require('../models/user');
 
 const router = express.Router();
 
-// router.use(auth);
+router.use(auth);
 
 router.get('/', (req, res) => {
     let user = req.user;

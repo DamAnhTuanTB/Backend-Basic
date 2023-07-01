@@ -12,7 +12,9 @@ router.use(auth);
 
 router.get('/', async (req, res) => {
 
-  let { keyword, minPrice, maxPrice, brands, category, sort } = req.query;
+  let { keyword, minPrice, maxPrice, brands, category, sort, page } = req.query;
+
+  const myPage = page || 1;
 
   const queryProduct = {
     salePrice: { $gte: minPrice ? Number(minPrice) : 0, $lte: maxPrice ? Number(maxPrice) : 999999999999 }
@@ -21,27 +23,34 @@ router.get('/', async (req, res) => {
     queryProduct.name = { $regex: keyword, $options: 'i' }
   }
 
-  const queryBrand = {
-    path: 'brand'
-  };
-
-  if (brands?.length > 0) {
-    queryBrand.match = {
-      _id: { $in: brands }
-    }
+  if(category){
+    queryProduct.category = category
   }
 
-  const queryCategory = {
-    path: 'category'
-  }
+  // const queryBrand = {
+  //   path: 'brand'
+  // };
 
-  if (!!category) {
-    queryCategory.match = {
-      _id: category
-    }
-  }
+  // if (brands?.length > 0) {
+  //   queryBrand.match = {
+  //     _id: { $in: brands }
+  //   }
+  // }
 
-  const products = (await ProductModel.find(queryProduct).populate(queryCategory)).filter(item => !!item.category);
+  // const queryCategory = {
+  //   path: 'category'
+  // }
+
+  // if (!!category) {
+  //   queryCategory.match = {
+  //     _id: category
+  //   }
+  // }
+
+
+    const totalProducts = await ProductModel.countDocuments(queryProduct);
+
+    const products = await ProductModel.find(queryProduct).skip((myPage - 1) * 12).limit(12);
 
   const responseProducts = products.map(product => ({
     id: product._id,
@@ -85,7 +94,10 @@ router.get('/', async (req, res) => {
   }
 
   res.status(200).send({
-    data: result
+    data: result,
+    totalProducts,
+    page: Number(myPage),
+    limit: 12
   })
 })
 
