@@ -5,18 +5,19 @@ const AddressModel = require("../models/address");
 
 const router = express.Router();
 
-// router.use(auth);
+router.use(auth);
 
 router.get("/", (req, res) => {
   AddressModel.find({ user: req.user._id })
     .then((data) =>
       res.status(200).send({
         data: data.map((item) => ({
+          id: item._id,
           name: item.name,
           telephone: item.telephone,
           email: item.email,
           address: item.address,
-          isDefault: item.isDefault,
+          // isDefault: item.isDefault,
         })),
       })
     )
@@ -36,7 +37,7 @@ router.get("/:id", (req, res) => {
           email: data.email,
           telephone: data.telephone,
           address: data.address,
-          isDefault: data.isDefault,
+          // isDefault: data.isDefault,
         },
       });
     })
@@ -58,7 +59,7 @@ router.post("/", (req, res) => {
 router.put("/:id", (req, res) => {
   const id = req.params.id;
   const data = req.body;
-  AddressModel.findOneAndUpdate({ _id: id }, data)
+  AddressModel.findOneAndUpdate({ _id: id, user: req.user._id }, data)
     .then(() => {
       res.status(200).send({ message: "Cập nhật thành công." });
     })

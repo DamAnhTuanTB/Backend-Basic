@@ -6,6 +6,7 @@ const PaymentModel = require('../models/payment');
 const OrderModel = require('../models/order');
 
 const TimelineModel = require('../models/timeline');
+const CartModel = require("../models/cart");
 
 const router = express.Router();
 
@@ -40,6 +41,10 @@ router.post('/', async (req, res) => {
         timeDelivery
       } = req.body;
       const payment = await PaymentModel.findById(paymentId);
+
+      payment.listCartId.forEach(async (cartId) => {
+        await CartModel.deleteOne({_id: cartId})
+      })
 
       const order = await OrderModel.create({
         user: req.user._id,

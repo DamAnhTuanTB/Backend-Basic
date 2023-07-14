@@ -35,6 +35,7 @@ router.post("/", async (req, res) => {
   try {
     EvaluateModel.create({
       ...req.body,
+      time: new Date(),
       user: req.user._id,
     }).then((data) => {
       res.status(200).send({

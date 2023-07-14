@@ -15,6 +15,7 @@ const paymentSchema = mongoose.Schema({
       price: Number,
     }
   ],
+  listCartId: [mongoose.Schema.Types.ObjectId],
   totalOriginPrice: Number,
   deliveryPrice: Number,
   totalPrice: Number,
