@@ -9,28 +9,27 @@ const router = express.Router();
 router.use(auth);
 
 router.get("/", async (req, res) => {
-  try{
+  try {
     const productQuery = {
-        path: "product",
-      };
-      const listCart = await CartModel.find({ user: req.user._id }).populate(
-        productQuery
-      );
+      path: "product",
+    };
+    const listCart = await CartModel.find({ user: req.user._id }).populate(
+      productQuery
+    );
 
-      res.status(200).send({
-        listCart: listCart.map((cart) => ({
-          id: cart._id,
-          image: cart.product.images[0],
-          productName: cart.product.name,
-          originPrice: cart.product.originPrice,
-          amount: cart.amount,
-          totalPrice: cart.amount * cart.product.originPrice,
-        }))
-      });
-  }catch(err){
-    res.status(500).send({message: "Lỗi server"})
+    res.status(200).send({
+      listCart: listCart.map((cart) => ({
+        id: cart._id,
+        image: cart.product.images[0],
+        productName: cart.product.name,
+        originPrice: cart.product.originPrice,
+        amount: cart.amount,
+        totalPrice: cart.amount * cart.product.originPrice,
+      })),
+    });
+  } catch (err) {
+    res.status(500).send({ message: "Lỗi server" });
   }
- 
 });
 
 router.post("/", async (req, res) => {
@@ -67,27 +66,27 @@ router.put("/:id", async (req, res) => {
 
   const { id } = req.params;
 
-  try{
+  try {
     const cart = await CartModel.findById(id);
 
     await CartModel.findOneAndUpdate(
       { _id: id },
       {
-        amount
+        amount,
       }
     );
-    
+
     const productQuery = {
       path: "product",
     };
-    
+
     const listCart = await CartModel.find({ user: req.user._id }).populate(
       productQuery
     );
 
     res.status(200).send({
-      message: 'Cập nhật thông tin giỏ hàng thành công.'
-    })
+      message: "Cập nhật thông tin giỏ hàng thành công.",
+    });
     // res.status(200).send({
     //   listCart: listCart.map((cart) => ({
     //     id: cart._id,
@@ -98,26 +97,22 @@ router.put("/:id", async (req, res) => {
     //     totalPrice: cart.amount * cart.product.originPrice,
     //   }))
     // });
-  }catch(err){
-    res.status(500).send({message: 'Lỗi server'})
+  } catch (err) {
+    res.status(500).send({ message: "Lỗi server" });
   }
-
 });
 
-
-
 router.delete("/:id", async (req, res) => {
-  try{
+  try {
     await CartModel.deleteOne({ _id: req.params.id });
     res.status(200).send({
       message: "Xóa sản phẩm khỏi giỏ hàng thành công",
     });
-  }catch(err){
+  } catch (err) {
     res.status(500).send({
-      message: "Lỗi server"
-    })
+      message: "Lỗi server",
+    });
   }
-  
 });
 
 module.exports = router;
