@@ -238,6 +238,7 @@ router.get('/relate/:id', async (req, res) => {
 })
 
 
+
 router.post('/', (req, res) => {
   ProductModel.create(req.body).then(data => {
     res.status(201).send({
