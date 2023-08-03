@@ -115,4 +115,17 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.delete('/delete-many', async (req, res) => {
+  try{
+    await CartModel.deleteMany({ _id: { $in: req.body.listCartId } });
+    res.status(200).send({
+      message: "Xóa thành công."
+    })
+  }catch(err){
+    res.status(500).send({
+        message: "Lỗi server",
+      });
+    }
+})
+
 module.exports = router;

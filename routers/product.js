@@ -12,9 +12,11 @@ router.use(auth);
 
 router.get('/', async (req, res) => {
 
-  let { keyword, minPrice, maxPrice, brands, category, sort, page } = req.query;
+  let { keyword, minPrice, maxPrice, brands, category, sort, page, limit } = req.query;
 
   const myPage = page || 1;
+
+  const myLimit = limit || 12;
 
   const queryProduct = {
     salePrice: { $gte: minPrice ? Number(minPrice) : 0, $lte: maxPrice ? Number(maxPrice) : 999999999999 }
@@ -50,7 +52,7 @@ router.get('/', async (req, res) => {
 
     const totalProducts = await ProductModel.countDocuments(queryProduct);
 
-    const products = await ProductModel.find(queryProduct).skip((myPage - 1) * 12).limit(12);
+    const products = await ProductModel.find(queryProduct).skip((myPage - 1) * myLimit).limit(myLimit);
 
   const responseProducts = products.map(product => ({
     id: product._id,
