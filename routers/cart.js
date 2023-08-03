@@ -115,7 +115,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.delete('/delete-many', async (req, res) => {
+router.post('/delete-many', async (req, res) => {
   try{
     await CartModel.deleteMany({ _id: { $in: req.body.listCartId } });
     res.status(200).send({
