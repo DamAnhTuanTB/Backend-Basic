@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
     const productQuery = {
       path: "product",
     };
-    const listCart = await CartModel.find({ user: req.user._id }).populate(
+    const listCart = await CartModel.find({}).populate(
       productQuery
     );
 

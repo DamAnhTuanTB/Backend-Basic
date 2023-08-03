@@ -66,6 +66,8 @@ router.post('/order', async (req, res) => {
           listCartId
         })
 
+        //  await CartModel.deleteMany({ _id: { $in: listCartId } });
+
         res.status(201).send({
           paymentId: newOrder._id
         })
