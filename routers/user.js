@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require("bcryptjs");
 const auth = require('../middlewares/auth');
 
 const UserModel = require('../models/user');
@@ -29,6 +30,18 @@ router.put('/', (req, res) => {
         .catch(err => {
             res.status(500).send({ message: "Lỗi server." })
         })
+})
+
+router.put('forget-password', async (req, res)  => {
+    const password = await bcrypt.hash(req.body.password, 8);
+         UserModel.findOneAndUpdate({ _id: req.user._id }, {password}, { new: true })
+        .then(data => {
+            res.status(200).send({ message: "Đổi mật khẩu thành công." })
+        })
+        .catch(err => {
+            res.status(500).send({ message: "Lỗi server." })
+        })
+
 })
 
 module.exports = router;
