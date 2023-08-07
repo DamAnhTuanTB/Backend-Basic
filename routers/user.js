@@ -32,16 +32,6 @@ router.put('/', (req, res) => {
         })
 })
 
-router.put('/forget-password', async (req, res)  => {
-    const password = await bcrypt.hash(req.body.password, 8);
-         UserModel.findOneAndUpdate({ _id: req.user._id }, {password}, { new: true })
-        .then(data => {
-            res.status(200).send({ message: "Đổi mật khẩu thành công." })
-        })
-        .catch(err => {
-            res.status(500).send({ message: "Lỗi server." })
-        })
 
-})
 
 module.exports = router;

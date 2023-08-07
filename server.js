@@ -17,15 +17,13 @@ const categoryRouters = require("./routers/category");
 const blogRouters = require("./routers/blog");
 const evaluateRouters = require("./routers/evaluate");
 const cartRouters = require("./routers/cart");
-const paymentRouters = require('./routers/payment');
-const orderRouters = require('./routers/order');
-const timelineRouters = require('./routers/timeline');
+const paymentRouters = require("./routers/payment");
+const orderRouters = require("./routers/order");
+const timelineRouters = require("./routers/timeline");
 
 mongoose.connect(
   "mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority"
 );
-
-
 
 const app = express();
 
@@ -106,6 +104,21 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.put("/forget-password", async (req, res) => {
+  const password = await bcrypt.hash(req.body.password, 8);
+  UserModel.findOneAndUpdate(
+    { email: req.body.email },
+    { password },
+    { new: true }
+  )
+    .then((data) => {
+      res.status(200).send({ message: "Đổi mật khẩu thành công." });
+    })
+    .catch((err) => {
+      res.status(500).send({ message: "Lỗi server." });
+    });
+});
+
 app.use("/user", userRouters);
 
 app.use("/address", addressRouters);
@@ -122,10 +135,10 @@ app.use("/evaluate", evaluateRouters);
 
 app.use("/cart", cartRouters);
 
-app.use('/payment', paymentRouters);
+app.use("/payment", paymentRouters);
 
-app.use('/order', orderRouters);
+app.use("/order", orderRouters);
 
-app.use('/timeline', timelineRouters);
+app.use("/timeline", timelineRouters);
 
 app.listen(process.env.PORT || 3030, () => {});
