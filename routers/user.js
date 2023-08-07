@@ -32,7 +32,7 @@ router.put('/', (req, res) => {
         })
 })
 
-router.put('forget-password', async (req, res)  => {
+router.put('/forget-password', async (req, res)  => {
     const password = await bcrypt.hash(req.body.password, 8);
          UserModel.findOneAndUpdate({ _id: req.user._id }, {password}, { new: true })
         .then(data => {
