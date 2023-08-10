@@ -89,7 +89,7 @@ router.get('/', async (req, res) => {
 
 
 router.post('/', (req, res) => {
-  ProductModel.create({...req.body, images: [req.body.image]}).then(data => {
+  ProductModel.create({...req.body, images: [req.body.image], manual: ['string'], information: ['string']}).then(data => {
     res.status(201).send({
       message: "Tạo sản phẩm thành công"
     })
