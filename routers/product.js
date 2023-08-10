@@ -50,9 +50,9 @@ router.get('/', async (req, res) => {
   // }
 
 
-    const totalProducts = await ProductModel.countDocuments(queryProduct);
+  const totalProducts = await ProductModel.countDocuments(queryProduct);
 
-    const products = await ProductModel.find(queryProduct).skip((myPage - 1) * myLimit).limit(myLimit);
+  const products = await ProductModel.find(queryProduct).skip((myPage - 1) * myLimit).limit(myLimit);
 
   const responseProducts = products.map(product => ({
     id: product._id,
@@ -99,14 +99,14 @@ router.get('/', async (req, res) => {
     data: result,
     totalProducts,
     page: Number(myPage),
-    limit: 12
+    limit: myLimit
   })
 })
 
 router.get('/:id', async (req, res) => {
   let { id } = req.params;
   try {
-    let productDetail = await ProductModel.findOne({ _id: id }).populate("category");
+    let productDetail = await ProductModel.findOne({ _id: id });
 
     const evaluateProduct = await EvaluateModel.aggregate([
       {
@@ -186,14 +186,7 @@ router.get('/relate/:id', async (req, res) => {
   try {
     const productDetail = await ProductModel.findById(id);
 
-    const queryCategory = {
-      path: 'category',
-      match: {
-        _id: productDetail.category
-      }
-    }
-
-    const products = (await ProductModel.find().populate(queryCategory)).filter(item => !!item.category);
+    const products = await ProductModel.find({category: productDetail.category})
 
     const responseProducts = products.map(product => ({
       id: product._id,
@@ -239,15 +232,35 @@ router.get('/relate/:id', async (req, res) => {
   }
 })
 
-
-
-router.post('/', (req, res) => {
-  ProductModel.create(req.body).then(data => {
+router.post('/admin', (req, res) => {
+  ProductModel.create({...req.body, images: [req.body.image]}).then(data => {
     res.status(201).send({
       message: "Tạo sản phẩm thành công"
     })
   })
 })
+
+router.put('admin/:id', (req, res) => {
+   const id = req.params.id;
+  const data = req.body;
+  if(data.image){
+    data.images = [data.image];
+    delete data.image;
+  }
+  ProductModel.findOneAndUpdate({ _id: id, user: req.user._id }, data)
+    .then(() => {
+      res.status(200).send({ message: "Cập nhật thành công." });
+    })
+    .catch((err) => res.status(500).send({ message: "Lỗi server" }));
+})
+
+router.delete("/admin/:id", (req, res) => {
+  const id = req.params.id;
+  ProductModel.deleteOne({ _id: id })
+    .then(() => res.status(200).send({ message: "Xóa địa chỉ thành công." }))
+    .catch((err) => res.status(500).send({ message: "Lỗi server" }));
+});
+
 
 
 

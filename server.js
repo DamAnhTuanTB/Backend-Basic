@@ -20,6 +20,7 @@ const cartRouters = require("./routers/cart");
 const paymentRouters = require("./routers/payment");
 const orderRouters = require("./routers/order");
 const timelineRouters = require("./routers/timeline");
+const adminProductsRouters = require('./routers/productAdmin')
 
 mongoose.connect(
   "mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority"
@@ -140,5 +141,7 @@ app.use("/payment", paymentRouters);
 app.use("/order", orderRouters);
 
 app.use("/timeline", timelineRouters);
+
+app.use('/admin/product', adminProductsRouters);
 
 app.listen(process.env.PORT || 3030, () => {});
