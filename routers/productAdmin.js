@@ -39,48 +39,49 @@ router.get('/', async (req, res) => {
   const responseProducts = products.map(product => ({
     id: product._id,
     name: product.name,
-    salePrice: product.salePrice,
-    originPrice: product.originPrice,
-    image: product.images[0],
     category: product.category,
-    brand: product.brand
+    brand: product.brand,
+    quantity: product.quantity,
+    originPrice: product.originPrice,
+    salePrice: product.salePrice,
+    image: product.images[0],
   }))
 
-  const productIds = products.map((product) => product._id);
+  // const productIds = products.map((product) => product._id);
 
-  const evaluateProducts = await EvaluateModel.aggregate([
-    {
-      $match: { product: { $in: productIds } }
-    },
-    {
-      $group: {
-        _id: "$product",
-        totalEvaluate: { $sum: 1 },
-        totalStar: { $sum: '$numberStar' }
-      }
-    }
-  ]);
+  // const evaluateProducts = await EvaluateModel.aggregate([
+  //   {
+  //     $match: { product: { $in: productIds } }
+  //   },
+  //   {
+  //     $group: {
+  //       _id: "$product",
+  //       totalEvaluate: { $sum: 1 },
+  //       totalStar: { $sum: '$numberStar' }
+  //     }
+  //   }
+  // ]);
 
-  let result = responseProducts.map(product => {
-    let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
-    if (evaluateItem) {
-      product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
-    } else {
-      product.star = 0
-    }
-    return product
-  })
+  // let result = responseProducts.map(product => {
+  //   let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
+  //   if (evaluateItem) {
+  //     product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
+  //   } else {
+  //     product.star = 0
+  //   }
+  //   return product
+  // })
 
   if (sort) {
     if (Number(sort) === 0) {
-      result.sort((a, b) => a.salePrice - b.salePrice)
+      responseProducts.sort((a, b) => a.salePrice - b.salePrice)
     } else if (Number(sort) === 1) {
-      result.sort((a, b) => b.salePrice - a.salePrice)
+      responseProducts.sort((a, b) => b.salePrice - a.salePrice)
     }
   }
 
   res.status(200).send({
-    data: result,
+    data: responseProducts,
     totalProducts,
     page: Number(myPage),
     limit: myLimit
@@ -89,7 +90,7 @@ router.get('/', async (req, res) => {
 
 
 router.post('/', (req, res) => {
-  ProductModel.create({...req.body, images: [req.body.image], manual: ['string'], information: ['string']}).then(data => {
+  ProductModel.create({...req.body, images: [req.body.image], manual: ['Hướng dẫn sử dụng'], information: ['Thông tin chi tiết sản phẩm']}).then(data => {
     res.status(201).send({
       message: "Tạo sản phẩm thành công"
     })
@@ -116,8 +117,6 @@ router.delete("/:id", (req, res) => {
     .then(() => res.status(200).send({ message: "Xóa sản phẩm thành công." }))
     .catch((err) => res.status(500).send({ message: "Xóa sản phẩm thất bại" }));
 });
-
-
 
 
 module.exports = router;
