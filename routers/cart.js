@@ -17,7 +17,6 @@ router.get("/", async (req, res) => {
       productQuery
     );
 
-    
     res.status(200).send({
       listCart: listCart?.filter((cart) => !!cart.product)?.map((cart) => ({
         id: cart._id,
