@@ -13,12 +13,12 @@ router.get("/", async (req, res) => {
     const productQuery = {
       path: "product",
     };
-    const listCart = await CartModel.find({}).populate(
+    const listCart = await CartModel.find({user: req.user._id}).populate(
       productQuery
     );
 
     res.status(200).send({
-      listCart: listCart.map((cart) => ({
+      listCart: listCart?.filter((cart) => !!cart.product)?.map((cart) => ({
         id: cart._id,
         image: cart.product.images[0],
         productName: cart.product.name,
@@ -67,36 +67,15 @@ router.put("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const cart = await CartModel.findById(id);
-
     await CartModel.findOneAndUpdate(
       { _id: id },
       {
         amount,
       }
     );
-
-    const productQuery = {
-      path: "product",
-    };
-
-    const listCart = await CartModel.find({ user: req.user._id }).populate(
-      productQuery
-    );
-
     res.status(200).send({
       message: "Cập nhật thông tin giỏ hàng thành công.",
     });
-    // res.status(200).send({
-    //   listCart: listCart.map((cart) => ({
-    //     id: cart._id,
-    //     image: cart.product.images[0],
-    //     productName: cart.product.name,
-    //     originPrice: cart.product.originPrice,
-    //     amount: cart.amount,
-    //     totalPrice: cart.amount * cart.product.originPrice,
-    //   }))
-    // });
   } catch (err) {
     res.status(500).send({ message: "Lỗi server" });
   }
