@@ -94,14 +94,41 @@ app.post("/login", async (req, res) => {
     }
     const user = await UserModel.findByCredentials(email, password);
     const token = await user.generateAuthToken();
+    const refreshToken = await user.generateRefreshToken();
     res.send({
-      user: {
-        name: user.name,
-      },
+      // user: {
+      //   name: user.name,
+      // },
       token,
+      refreshToken,
     });
   } catch (error) {
     res.status(400).send({ message: error.message });
+  }
+});
+
+app.post("/generate-token", async (req, res) => {
+  try {
+    const data = jwt.verify(req.body.refreshToken, "mk");
+    const token = jwt.sign({ _id: data._id }, "mk", { expiresIn: "2m" });
+    const refreshToken = jwt.sign({ _id: data._id }, "mk", {
+      expiresIn: "10m",
+    });
+    UserModel.findOne({
+      _id: data._id,
+    })
+      .then((data) => {
+        res.status(200).send({
+          token,
+          refreshToken,
+        });
+      })
+      .catch((err) => {
+        res.status(401).json({ message: "Vui lòng đăng nhập để tiếp tục" });
+      });
+  } catch (error) {
+    // res.status(401).json({message: "Vui lòng đăng nhập để tiếp tục"});
+    res.status(401).json({ message: "Vui lòng đăng nhập để tiếp tục" });
   }
 });
 
