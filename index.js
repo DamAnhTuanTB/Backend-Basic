@@ -22,6 +22,8 @@ const orderRouters = require("./routers/order");
 const timelineRouters = require("./routers/timeline");
 const adminProductsRouters = require("./routers/productAdmin");
 
+const jwt = require("jsonwebtoken");
+
 mongoose.connect(
   "mongodb+srv://damanhtuan24022000:damanhtuan24022000@cluster1.zxnza45.mongodb.net/my_database?retryWrites=true&w=majority"
 );
@@ -110,9 +112,9 @@ app.post("/login", async (req, res) => {
 app.post("/generate-token", async (req, res) => {
   try {
     const data = jwt.verify(req.body.refreshToken, "mk");
-    const token = jwt.sign({ _id: data._id }, "mk", { expiresIn: "2m" });
+    const token = jwt.sign({ _id: data._id }, "mk", { expiresIn: "15d" });
     const refreshToken = jwt.sign({ _id: data._id }, "mk", {
-      expiresIn: "10m",
+      expiresIn: "30d",
     });
     UserModel.findOne({
       _id: data._id,

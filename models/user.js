@@ -52,14 +52,14 @@ const userSchema = mongoose.Schema({
 userSchema.methods.generateAuthToken = async function () {
   // Generate an auth token for the user
   const user = this;
-  const token = jwt.sign({ _id: user._id }, "mk", { expiresIn: "2m" });
+  const token = jwt.sign({ _id: user._id }, "mk", { expiresIn: "15d" });
   return token;
 };
 
 userSchema.methods.generateRefreshToken = async function () {
   // Generate an auth token for the user
   const user = this;
-  const refreshToken = jwt.sign({ _id: user._id }, "mk", { expiresIn: "10m" });
+  const refreshToken = jwt.sign({ _id: user._id }, "mk", { expiresIn: "30d" });
   return refreshToken;
 };
 
