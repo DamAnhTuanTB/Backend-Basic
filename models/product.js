@@ -8,7 +8,8 @@ const productSchema = mongoose.Schema({
   salePrice: Number,
   information: [String],
   manual: [String],
-  images: [String]
+  images: [String],
+  createdAt: Date,
 });
 
 const ProductModel = mongoose.model('product', productSchema);
