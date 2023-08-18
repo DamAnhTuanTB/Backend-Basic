@@ -9,9 +9,11 @@ const router = express.Router();
 
 // router.use(auth);
 
+const listCategory = ['Dầu gội đầu', 'Sữa tắm', 'Sữa rửa mặt', 'Nước hoa', 'Miếng dán mụn', 'Kem chống nắng', 'Kem tẩy tế bào chết']
+
 router.get('/', async (req, res) => {
 
-  let { keyword, minPrice, maxPrice, brand, category, sort, page, limit } = req.query;
+  let { keyword, minPrice, maxPrice, category, sort, page, limit } = req.query;
 
   const myPage = page || 1;
 
@@ -26,10 +28,6 @@ router.get('/', async (req, res) => {
 
   if(category){
     queryProduct.category = category
-  }
-
-  if(brand){
-    queryProduct.brand = brand;
   }
 
   const totalProducts = await ProductModel.countDocuments(queryProduct);

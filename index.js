@@ -21,6 +21,7 @@ const paymentRouters = require("./routers/payment");
 const orderRouters = require("./routers/order");
 const timelineRouters = require("./routers/timeline");
 const adminProductsRouters = require("./routers/productAdmin");
+const adminUserRouters = require('./routers/userAdmin');
 
 const jwt = require("jsonwebtoken");
 
@@ -172,6 +173,8 @@ app.use("/order", orderRouters);
 app.use("/timeline", timelineRouters);
 
 app.use("/admin/product", adminProductsRouters);
+
+app.use('/admin/user', adminUserRouters);
 
 app.listen(process.env.PORT || 3030, () => {});
 
