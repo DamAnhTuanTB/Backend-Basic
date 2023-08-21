@@ -47,6 +47,12 @@ const userSchema = mongoose.Schema({
     enum: ["male", "female", "other"],
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    required: true,
+    default: 'user'
+  },
 });
 
 userSchema.methods.generateAuthToken = async function () {
