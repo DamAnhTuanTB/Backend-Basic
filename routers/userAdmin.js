@@ -9,6 +9,8 @@ const PaymentModel = require('../models/payment');
 
 const CartModel = require("../models/cart");
 
+const bcrypt = require("bcryptjs");
+
 const router = express.Router();
 
 // router.use(auth);
@@ -21,11 +23,14 @@ router.post("/", async (req, res) => {
         .status(400)
         .send({ message: "Vui lòng gửi đầy đủ thông tin." });
     }
+ 
     const checkUnique = await UserModel.checkUniqueUser(email, telephone);
     if (checkUnique) {
       return res.status(400).send(checkUnique);
     }
+
     req.body.password = await bcrypt.hash(req.body.password, 8);
+
     UserModel.create(req.body)
       .then(() => {
         res.status(201).send({ message: "Tạo tài khoản khách hàng thành công." });

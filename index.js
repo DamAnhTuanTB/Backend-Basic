@@ -89,14 +89,19 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     if (!email || !password) {
       return res
         .status(400)
         .send({ message: "Vui lòng gửi đầy đủ thông tin." });
     }
     const user = await UserModel.findByCredentials(email, password);
+
+    if((role === 'admin' && user.role !== 'admin') || (role !== 'admin' && user.role === 'admin')){
+        return res.status(400).send({ message: "Sai email hoặc mật khẩu." });
+    }
     const token = await user.generateAuthToken();
+    
     const refreshToken = await user.generateRefreshToken();
     res.send({
       // user: {
