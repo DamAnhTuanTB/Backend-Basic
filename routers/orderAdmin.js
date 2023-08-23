@@ -1,132 +1,128 @@
 const express = require("express");
 // const auth = require('../middlewares/auth');
 
-const ProductModel = require("../models/product");
-
 const OrderModel = require("../models/order");
 
 const router = express.Router();
 
-
 // router.use(auth);
-
+ 
 router.get("/", async (req, res) => {
-  let { keyword, minPrice, maxPrice, category, sort, page, limit } = req.query;
+  // -1: giảm dần
+  // 1: tăng dần
+  // 0: Mặc định
+  let { keyword, sortMoney, startDate, endDate, orderStatus, methodPayment, page, limit} = req.query;
 
-  const myPage = page || 1;
+  sortMoney = Number(sortMoney);
 
-  const myLimit = limit || 12;
+  const myPage = Number(page) || 1;
 
-  const queryProduct = {
-    salePrice: {
-      $gte: minPrice ? Number(minPrice) : 0,
-      $lte: maxPrice ? Number(maxPrice) : 999999999999,
-    },
-  };
-  if (keyword) {
-    queryProduct.name = { $regex: keyword, $options: "i" };
+  const myLimit = Number(limit) || 12;
+
+  const conditions = {};
+
+  const dateCondition = {};
+
+  const sortCondition = {};
+
+  if(sortMoney){
+    sortCondition.totalPrice = sortMoney;
   }
 
-  if (category) {
-    queryProduct.category = category;
+  const myKeyword = keyword || '';
+
+  if(startDate){
+    dateCondition.$gte = new Date(startDate);
   }
 
-  const totalProducts = await ProductModel.countDocuments(queryProduct);
+  if(endDate){
+    dateCondition.$lte = new Date(endDate);
+  }
 
-  const products = await ProductModel.find(queryProduct)
-    .sort({ createdAt: -1 })
-    .skip((myPage - 1) * myLimit)
-    .limit(myLimit);
+  if(JSON.stringify(dateCondition) !== '{}'){
+    conditions.createdAt = dateCondition
+  }
 
-  const responseProducts = products.map((product) => ({
-    id: product._id,
-    name: product.name,
-    category: product.category,
-    brand: product.brand,
-    quantity: product.quantity,
-    originPrice: product.originPrice,
-    salePrice: product.salePrice,
-    image: product.images[0],
-  }));
+  if(orderStatus){
+    conditions.status = orderStatus
+  }
 
-  // const productIds = products.map((product) => product._id);
+  if(methodPayment){
+    conditions.methodPayment = methodPayment;
+  }
 
-  // const evaluateProducts = await EvaluateModel.aggregate([
-  //   {
-  //     $match: { product: { $in: productIds } }
-  //   },
-  //   {
-  //     $group: {
-  //       _id: "$product",
-  //       totalEvaluate: { $sum: 1 },
-  //       totalStar: { $sum: '$numberStar' }
-  //     }
-  //   }
-  // ]);
-
-  // let result = responseProducts.map(product => {
-  //   let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
-  //   if (evaluateItem) {
-  //     product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
-  //   } else {
-  //     product.star = 0
-  //   }
-  //   return product
-  // })
-
-  if (sort) {
-    if (Number(sort) === 0) {
-      responseProducts.sort((a, b) => a.salePrice - b.salePrice);
-    } else if (Number(sort) === 1) {
-      responseProducts.sort((a, b) => b.salePrice - a.salePrice);
+  const results = await OrderModel.find(conditions).sort(sortCondition).populate(
+    {
+      path: 'user', 
+      match: {
+        $or: [
+          {
+            name: 
+              {
+                $regex: myKeyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), $options: 'i'
+              }
+          },
+          {
+            email: 
+              {
+                $regex: myKeyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), $options: 'i'
+              }
+          }
+        ]
+      }
     }
-  }
+  )
+
+  const filterResults = results.filter(order => order.user);
+
+  const startIndex = (myPage - 1)*myLimit;
+  const endIndex = startIndex + myLimit;
+
+  const totalOrders = filterResults.length;
+
+  const response = filterResults.slice(startIndex, endIndex).map((item) => ({
+    orderId: item._id,
+    userInfo: {
+      id: item.user._id,
+      name: item.user.name,
+      email: item.user.email,
+      telephone: item.user.telephone,
+      date: item.user.date,
+      gender: item.user.gender
+    },
+    productsInfo: item.products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      amount: product.amount,
+      price: product.price
+    })),
+    totalOriginPrice: item.totalOriginPrice,
+    deliveryPrice: item.deliveryPrice,
+    totalPrice: item.totalPrice,
+    methodPayment: item.methodPayment,
+    orderStatus: item.status,
+    noteOrder: item.noteOrder,
+    createdAt: item?.createdAt
+  }))
 
   res.status(200).send({
-    data: responseProducts,
-    totalProducts,
-    page: Number(myPage),
-    limit: myLimit,
-  });
-});
-
-router.post("/", (req, res) => {
-  ProductModel.create({
-    ...req.body,
-    createdAt: new Date(),
-    images: [req.body.image],
-    manual: ["Hướng dẫn sử dụng"],
-    information: ["Thông tin chi tiết sản phẩm"],
+        data: response,
+        totalOrders,
+        page: Number(myPage),
+        limit: Number(myLimit)
   })
-    .then((data) => {
-      res.status(201).send({
-        message: "Tạo sản phẩm thành công",
-      });
-    })
-    .catch((err) => res.status(500).send({ message: "Tạo sản phẩm thất bại" }));
 });
 
 router.put("/:id", (req, res) => {
   const id = req.params.id;
-  const data = req.body;
-  if (data.image) {
-    data.images = [data.image];
-    delete data.image;
-  }
-  ProductModel.findOneAndUpdate({ _id: id, user: req.user._id }, data)
+  OrderModel.findOneAndUpdate({ _id: id }, {status: req.body.orderStatus})
     .then(() => {
-      res.status(200).send({ message: "Cập nhật sản phẩm thành công." });
+      res.status(200).send({ message: "Cập nhật trạng thái đơn hàng thành công." });
     })
     .catch((err) =>
-      res.status(500).send({ message: "Cập nhật sản phẩm thất bại" })
+      res.status(500).send({ message: "Cập nhật trạng thái đơn hàng thất bại." })
     );
-});
-
-router.delete("/:id", (req, res) => {
-  const id = req.params.id;
-  ProductModel.deleteOne({ _id: id })
-    .then(() => res.status(200).send({ message: "Xóa sản phẩm thành công." }))
-    .catch((err) => res.status(500).send({ message: "Xóa sản phẩm thất bại" }));
 });
 
 module.exports = router;

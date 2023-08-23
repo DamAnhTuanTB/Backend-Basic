@@ -55,13 +55,17 @@ router.get('/', async (req, res) => {
     const myLimit = limit || 12;
 
     const queryUser = {};
+    
     if (keyword) {
         queryUser.name = { $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), $options: 'i' }
     }
 
     const totalUsers = await UserModel.countDocuments(queryUser);
 
-    const users = await UserModel.find(queryUser).skip((myPage - 1) * myLimit).limit(myLimit);
+    const startIndex = (myPage - 1)*myLimit;
+    const endIndex = startIndex + myLimit;
+
+    const users = await UserModel.find(queryUser).sort({name: 1});
 
     const usersWithOrders = await OrderModel.aggregate([
         {
@@ -85,8 +89,6 @@ router.get('/', async (req, res) => {
         };
     });
 
-    result.sort((a, b) => a.name - b.name);
-
     if(Number(sort) === 0){
         result.sort((a, b) => b.totalMoney - a.totalMoney)
     }else if(Number(sort) === 1){
@@ -94,18 +96,18 @@ router.get('/', async (req, res) => {
     }
 
     res.status(200).send({
-        data: result,
+        data: result.slice(startIndex, endIndex),
         totalUsers,
         page: Number(myPage),
         limit: myLimit
     })
 })
 
-router.put('/', (req, res) => {
+router.put('/:id', (req, res) => {
     if (req.body.email || req.body.password) {
         res.status(400).send({ message: 'Vui lòng gửi đúng dữ liệu' })
     }
-    UserModel.findOneAndUpdate({ _id: req.user._id }, req.body, { new: true })
+    UserModel.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
         .then(data => {
             res.status(200).send({ message: "Cập nhật thông tin cá nhân thành công." })
         })

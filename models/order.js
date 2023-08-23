@@ -37,7 +37,8 @@ const orderSchema = mongoose.Schema({
     enum: [1, 2, 3]
   },
   noteOrder: String,
-  timeUpdate: Date
+  timeUpdate: Date,
+  createdAt: Date,
 })
 
 const OrderModel = mongoose.model('order', orderSchema);

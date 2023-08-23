@@ -57,7 +57,8 @@ router.post('/', async (req, res) => {
         status: 'processing',
         timeDelivery,
         noteOrder,
-        timeUpdate: new Date()
+        timeUpdate: new Date(),
+        createdAt: new Date,
       })
 
       await TimelineModel.create({

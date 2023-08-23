@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     salePrice: { $gte: minPrice ? Number(minPrice) : 0, $lte: maxPrice ? Number(maxPrice) : 999999999999 }
   };
   if (keyword) {
-    queryProduct.name = { $regex: keyword, $options: 'i' }
+    queryProduct.name = { $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), $options: 'i' }
   }
 
   if(category){
