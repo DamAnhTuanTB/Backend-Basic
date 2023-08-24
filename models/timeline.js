@@ -6,7 +6,7 @@ const timelineSchema = mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['processing', 'in_transit', 'delivered', 'canceled'],
+    enum: ['processing', 'confirmed', 'in_transit', 'delivered', 'canceled'],
     required: true
   },
   timeUpdate: Date

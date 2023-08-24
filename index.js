@@ -21,8 +21,9 @@ const paymentRouters = require("./routers/payment");
 const orderRouters = require("./routers/order");
 const timelineRouters = require("./routers/timeline");
 const adminProductsRouters = require("./routers/productAdmin");
-const adminUserRouters = require('./routers/userAdmin');
-const adminOrders = require('./routers/orderAdmin')
+const adminUserRouters = require("./routers/userAdmin");
+const adminOrders = require("./routers/orderAdmin");
+const adminBrandRouters = require("./routers/brandAdmin");
 
 const jwt = require("jsonwebtoken");
 
@@ -98,11 +99,14 @@ app.post("/login", async (req, res) => {
     }
     const user = await UserModel.findByCredentials(email, password);
 
-    if((role === 'admin' && user.role !== 'admin') || (role !== 'admin' && user.role === 'admin')){
-        return res.status(400).send({ message: "Sai email hoặc mật khẩu." });
+    if (
+      (role === "admin" && user.role !== "admin") ||
+      (role !== "admin" && user.role === "admin")
+    ) {
+      return res.status(400).send({ message: "Sai email hoặc mật khẩu." });
     }
     const token = await user.generateAuthToken();
-    
+
     const refreshToken = await user.generateRefreshToken();
     res.send({
       // user: {
@@ -180,9 +184,11 @@ app.use("/timeline", timelineRouters);
 
 app.use("/admin/product", adminProductsRouters);
 
-app.use('/admin/user', adminUserRouters);
+app.use("/admin/user", adminUserRouters);
 
-app.use('/admin/order', adminOrders);
+app.use("/admin/order", adminOrders);
+
+app.use("/admin/brand", adminBrandRouters);
 
 app.listen(process.env.PORT || 3030, () => {});
 
