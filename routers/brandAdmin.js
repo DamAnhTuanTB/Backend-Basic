@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
     });
   }
 
-  BrandModel.create(req.body).then((data) => {
+  BrandModel.create({...req.body, createdAt: new Date()}).then((data) => {
     res.status(201).send({
       message: "Tạo thương hiệu thành công.",
     });
@@ -59,12 +59,13 @@ router.get("/", async (req, res) => {
     return {
       id: brand._id,
       name: brand.name,
+      image: brand.image,
       createdAt: brand.createdAt,
     };
   });
 
   res.status(200).send({
-    data: result.slice(startIndex, endIndex),
+    data: result,
     totalBrands,
     page: Number(myPage),
     limit: myLimit,

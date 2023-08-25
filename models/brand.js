@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const brandSchema = mongoose.Schema({
   name: String,
+  image: String,
   createdAt: Date,
 });
 
