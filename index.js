@@ -24,6 +24,7 @@ const adminProductsRouters = require("./routers/productAdmin");
 const adminUserRouters = require("./routers/userAdmin");
 const adminOrders = require("./routers/orderAdmin");
 const adminBrandRouters = require("./routers/brandAdmin");
+const adminEvaluateRouters = require('./routers/evaluateAdmin')
 
 const jwt = require("jsonwebtoken");
 
@@ -189,6 +190,8 @@ app.use("/admin/user", adminUserRouters);
 app.use("/admin/order", adminOrders);
 
 app.use("/admin/brand", adminBrandRouters);
+
+app.use("/admin/evaluate", adminEvaluateRouters)
 
 app.listen(process.env.PORT || 3030, () => {});
 

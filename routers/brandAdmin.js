@@ -30,7 +30,7 @@ router.get("/", async (req, res) => {
 
   const myPage = page || 1;
 
-  const myLimit = limit || 12;
+  const myLimit = limit || 10;
 
   const queryBrand = {};
 
@@ -82,6 +82,17 @@ router.put("/:id", (req, res) => {
     });
 });
 
+
+router.delete('/delete-many', async (req, res) => {
+  try{
+    const ids = req.query.idArr;
+    await BrandModel.deleteMany({_id: {$in: ids}});
+    res.status(200).send({message: 'Xóa nhiều thương hiệu thành công.'})
+  }catch(err){
+    res.status(500).send({message: "Xóa nhiều thương hiệu thất bại."})
+  }
+})
+
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
   BrandModel.deleteOne({ _id: id })
@@ -92,5 +103,6 @@ router.delete("/:id", (req, res) => {
       res.status(500).send({ message: "Xóa thương hiệu thất bại." })
     );
 });
+
 
 module.exports = router;

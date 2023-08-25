@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
 
   const myPage = Number(page) || 1;
 
-  const myLimit = Number(limit) || 12;
+  const myLimit = Number(limit) || 10;
 
   const conditions = {};
 

@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
 
     const myPage = page || 1;
 
-    const myLimit = limit || 12;
+    const myLimit = limit || 10;
 
     const queryUser = {};
     

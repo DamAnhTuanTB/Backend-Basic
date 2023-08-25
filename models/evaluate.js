@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { boolean } = require('webidl-conversions');
 const evaluateSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -10,6 +11,10 @@ const evaluateSchema = mongoose.Schema({
   },
   numberStar: Number,
   comment: String,
+  allowVisible: {
+    type: Boolean,
+    default: false
+  },
   time: Date
 })
 
