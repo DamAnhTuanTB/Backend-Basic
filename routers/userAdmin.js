@@ -7,6 +7,8 @@ const OrderModel = require('../models/order');
 
 const PaymentModel = require('../models/payment');
 
+const EvaluateModel = require('../models/evaluate')
+
 const CartModel = require("../models/cart");
 
 const bcrypt = require("bcryptjs");
@@ -54,7 +56,7 @@ router.get('/', async (req, res) => {
 
     const myLimit = limit || 10;
 
-    const queryUser = {};
+    const queryUser = {role: { $ne: 'admin' }};
     
     if (keyword) {
         queryUser.name = { $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), $options: 'i' }
@@ -123,6 +125,7 @@ router.delete("/:id", (req, res) => {
         await OrderModel.deleteMany({ user: id });
         await PaymentModel.deleteMany({user: id});
         await CartModel.deleteMany({user: id});
+        await EvaluateModel.deleteMany({user: id});
         res.status(200).send({ message: "Xóa khách hàng thành công." })} )
     .catch((err) => res.status(500).send({ message: "Xóa khách hàng thất bại" }));
 });
