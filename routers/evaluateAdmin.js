@@ -14,9 +14,9 @@ router.get("/", async (req, res) => {
 
   keyword = keyword || '';
 
-  const myPage = page || 1;
+  const myPage = Number(page) || 1;
 
-  const myLimit = limit || 10;
+  const myLimit = Number(limit) || 10;
 
   try {
     //  const totalEvaluate = await BrandModel.countDocuments(queryBrand);
