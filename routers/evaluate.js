@@ -6,7 +6,7 @@ const EvaluateModel = require("../models/evaluate");
 
 const router = express.Router();
 
-// router.use(auth);
+router.use(auth);
 
 router.get("/:id", (req, res) => {
   try {
