@@ -6,12 +6,12 @@ const EvaluateModel = require("../models/evaluate");
 
 const router = express.Router();
 
-router.use(auth);
+// router.use(auth);
 
 router.get("/:id", (req, res) => {
   try {
     let idProduct = req.params.id;
-    EvaluateModel.find({ product: idProduct })
+    EvaluateModel.find({ product: idProduct, allowVisible: true })
       .populate("user")
       .then((data) => {
         res.status(200).send({
@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
       user: req.user._id,
     }).then((data) => {
       res.status(200).send({
-        message: "Tạo đánh giá thành công",
+        message: "Chúng tôi đã ghi nhận đánh giá của bạn. Đánh giá của bạn sẽ được xét duyệt bởi admin. Cảm ơn bạn.",
       });
     });
   } catch (error) {
