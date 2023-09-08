@@ -12,6 +12,19 @@ const router = express.Router();
 
 router.use(auth);
 
+router.get('/list-order', async (req, res) => {
+  try{
+    const listOrders = await OrderModel.find({user: req.user._id}).lean();
+      res.status(200).send({
+        data: listOrders
+      })
+  }catch(err){
+    res.status(500).send({
+      message: 'Lỗi server.'
+    })
+  }
+})
+
 router.get('/:id', async (req, res) => {
   try{
     const order = await OrderModel.findById(req.params.id);
@@ -27,6 +40,32 @@ router.get('/:id', async (req, res) => {
   }catch(error){
     res.status(500).send({
       message: "Lỗi server"
+    })
+  }
+})
+
+router.get('/detail/:id', async (req, res) => {
+  try{
+    const orderDetail = await OrderModel.findById(req.params.id).lean();
+
+    const timelineCurrent = await TimelineModel.find({
+      order: req.params.id,
+    }).sort({ timeUpdate: -1 });
+
+    const timelineDetail = timelineCurrent.map((item) => ({
+      status: item.status,
+      timeUpdate: item.timeUpdate,
+    }))
+
+    res.status(200).send({
+      data: {
+        ...orderDetail,
+        timelineDetail
+      }
+    })
+  }catch(err){
+    res.status(500).send({
+      message: 'Lỗi server.'
     })
   }
 })
