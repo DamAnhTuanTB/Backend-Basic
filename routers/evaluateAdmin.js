@@ -218,11 +218,11 @@ router.put("/allow-visible/:id", async (req, res) => {
     await EvaluateModel.updateOne({ _id: id }, { allowVisible });
     res
       .status(200)
-      .send({ message: "Cập nhật các đánh giá sẽ được xuất hiện thành công." });
+      .send({ message: "Cập nhật sự xuất hiện của đánh giá thành công." });
   } catch (err) {
     res
       .status(500)
-      .send({ message: "Cập nhật các đánh giá sẽ được xuất hiện thất bại." });
+      .send({ message: "Cập nhật sự xuất hiện của đánh giá thất bại." });
   }
 });
 
