@@ -122,7 +122,7 @@ router.put("/:id", (req, res) => {
     data.images = [data.image];
     delete data.image;
   }
-  ProductModel.findOneAndUpdate({ _id: id, user: req.user._id }, data)
+  ProductModel.findOneAndUpdate({ _id: id }, data)
     .then(() => {
       res.status(200).send({ message: "Cập nhật sản phẩm thành công." });
     })
