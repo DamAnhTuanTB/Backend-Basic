@@ -177,6 +177,7 @@ router.get("/:id", async (req, res) => {
         star: e.numberStar,
         comment: e.comment,
         time: e.time,
+        allowVisible: e.allowVisible
         }))
       
     res.status(200).send({
