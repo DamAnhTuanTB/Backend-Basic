@@ -232,38 +232,4 @@ router.get('/relate/:id', async (req, res) => {
   }
 })
 
-router.post('/admin', (req, res) => {
-  ProductModel.create({...req.body, images: [req.body.image]}).then(data => {
-    res.status(201).send({
-      message: "Tạo sản phẩm thành công"
-    })
-  })
-})
-
-router.put('admin/:id', (req, res) => {
-   const id = req.params.id;
-  const data = req.body;
-  if(data.image){
-    data.images = [data.image];
-    delete data.image;
-  }
-  ProductModel.findOneAndUpdate({ _id: id, user: req.user._id }, data)
-    .then(() => {
-      res.status(200).send({ message: "Cập nhật thành công." });
-    })
-    .catch((err) => res.status(500).send({ message: "Lỗi server" }));
-})
-
-router.delete("/admin/:id", (req, res) => {
-  const id = req.params.id;
-  ProductModel.deleteOne({ _id: id })
-    .then(() => res.status(200).send({ message: "Xóa địa chỉ thành công." }))
-    .catch((err) => res.status(500).send({ message: "Lỗi server" }));
-});
-
-
-
-
-
-
 module.exports = router;
