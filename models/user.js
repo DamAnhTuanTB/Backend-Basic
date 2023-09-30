@@ -6,6 +6,16 @@ const jwt = require("jsonwebtoken");
 const userSchema = mongoose.Schema({
   name: {
     type: String,
+    required: false,
+    trim: true,
+  },
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
+    type: String,
     required: true,
     trim: true,
   },
@@ -28,12 +38,12 @@ const userSchema = mongoose.Schema({
   },
   date: {
     type: Date,
-    required: true,
+    required: false,
   },
   telephone: {
     type: String,
     unique: true,
-    required: true,
+    required: false,
     validate: (value) => {
       if (!validator.isMobilePhone(value, ["vi-VN"])) {
         throw new Error(
@@ -45,7 +55,7 @@ const userSchema = mongoose.Schema({
   gender: {
     type: String,
     enum: ["male", "female", "other"],
-    required: true,
+    required: false,
   },
   role: {
     type: String,
