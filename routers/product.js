@@ -1,32 +1,38 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const mongoose = require('mongoose');
+const express = require("express");
+// const auth = require('../middlewares/auth');
+const mongoose = require("mongoose");
 
-const ProductModel = require('../models/product');
+const ProductModel = require("../models/product");
 
-const EvaluateModel = require('../models/evaluate');
+const EvaluateModel = require("../models/evaluate");
 
 const router = express.Router();
 
-router.use(auth);
+// router.use(auth);
 
-router.get('/', async (req, res) => {
-
-  let { keyword, minPrice, maxPrice, brands, category, sort, page, limit } = req.query;
+router.get("/", async (req, res) => {
+  let { keyword, minPrice, maxPrice, brands, category, sort, page, limit } =
+    req.query;
 
   const myPage = page || 1;
 
   const myLimit = limit || 12;
 
   const queryProduct = {
-    salePrice: { $gte: minPrice ? Number(minPrice) : 0, $lte: maxPrice ? Number(maxPrice) : 999999999999 }
+    salePrice: {
+      $gte: minPrice ? Number(minPrice) : 0,
+      $lte: maxPrice ? Number(maxPrice) : 999999999999,
+    },
   };
   if (keyword) {
-    queryProduct.name = { $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), $options: 'i' }
+    queryProduct.name = {
+      $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
+      $options: "i",
+    };
   }
 
-  if(category){
-    queryProduct.category = category
+  if (category) {
+    queryProduct.category = category;
   }
 
   // const queryBrand = {
@@ -49,49 +55,54 @@ router.get('/', async (req, res) => {
   //   }
   // }
 
-
   const totalProducts = await ProductModel.countDocuments(queryProduct);
 
-  const products = await ProductModel.find(queryProduct).skip((myPage - 1) * myLimit).limit(myLimit);
+  const products = await ProductModel.find(queryProduct)
+    .skip((myPage - 1) * myLimit)
+    .limit(myLimit);
 
-  const responseProducts = products.map(product => ({
+  const responseProducts = products.map((product) => ({
     id: product._id,
     name: product.name,
     salePrice: product.salePrice,
     originPrice: product.originPrice,
-    image: product.images[0]
-  }))
+    image: product.images[0],
+  }));
 
   const productIds = products.map((product) => product._id);
 
   const evaluateProducts = await EvaluateModel.aggregate([
     {
-      $match: { product: { $in: productIds } }
+      $match: { product: { $in: productIds } },
     },
     {
       $group: {
         _id: "$product",
         totalEvaluate: { $sum: 1 },
-        totalStar: { $sum: '$numberStar' }
-      }
-    }
+        totalStar: { $sum: "$numberStar" },
+      },
+    },
   ]);
 
-  let result = responseProducts.map(product => {
-    let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
+  let result = responseProducts.map((product) => {
+    let evaluateItem = evaluateProducts.find(
+      (evaluate) => String(evaluate._id) === String(product.id)
+    );
     if (evaluateItem) {
-      product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
+      product.star = Math.floor(
+        Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate)
+      );
     } else {
-      product.star = 0
+      product.star = 0;
     }
-    return product
-  })
+    return product;
+  });
 
   if (sort) {
     if (Number(sort) === 0) {
-      result.sort((a, b) => a.salePrice - b.salePrice)
+      result.sort((a, b) => a.salePrice - b.salePrice);
     } else if (Number(sort) === 1) {
-      result.sort((a, b) => b.salePrice - a.salePrice)
+      result.sort((a, b) => b.salePrice - a.salePrice);
     }
   }
 
@@ -99,29 +110,31 @@ router.get('/', async (req, res) => {
     data: result,
     totalProducts,
     page: Number(myPage),
-    limit: myLimit
-  })
-})
+    limit: myLimit,
+  });
+});
 
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   let { id } = req.params;
   try {
     let productDetail = await ProductModel.findOne({ _id: id });
 
     const evaluateProduct = await EvaluateModel.aggregate([
       {
-        $match: { product: new mongoose.Types.ObjectId(id) }
+        $match: { product: new mongoose.Types.ObjectId(id) },
       },
       {
         $group: {
           _id: "$product",
           totalEvaluate: { $sum: 1 },
-          totalStar: { $sum: '$numberStar' }
-        }
-      }
+          totalStar: { $sum: "$numberStar" },
+        },
+      },
     ]);
 
-    const evaluates = await EvaluateModel.find({ product: new mongoose.Types.ObjectId(id) });
+    const evaluates = await EvaluateModel.find({
+      product: new mongoose.Types.ObjectId(id),
+    });
 
     let oneStar = 0;
     let twoStar = 0;
@@ -129,7 +142,7 @@ router.get('/:id', async (req, res) => {
     let fourStar = 0;
     let fiveStar = 0;
 
-    evaluates.forEach(e => {
+    evaluates.forEach((e) => {
       switch (Number(e.numberStar)) {
         case 1:
           oneStar++;
@@ -145,12 +158,11 @@ router.get('/:id', async (req, res) => {
           break;
         case 5:
           fiveStar++;
-          break
+          break;
         default:
           break;
       }
-    })
-
+    });
 
     res.status(200).send({
       data: {
@@ -161,75 +173,85 @@ router.get('/:id', async (req, res) => {
         originPrice: productDetail.originPrice,
         information: productDetail.information,
         manual: productDetail.manual,
-        totalEvaluate: evaluateProduct?.length > 0 ? evaluateProduct[0].totalEvaluate : 0,
-        star: evaluateProduct.length > 0 ? Math.floor(Number(evaluateProduct[0].totalStar) / Number(evaluateProduct[0].totalEvaluate)) : 0,
+        totalEvaluate:
+          evaluateProduct?.length > 0 ? evaluateProduct[0].totalEvaluate : 0,
+        star:
+          evaluateProduct.length > 0
+            ? Math.floor(
+                Number(evaluateProduct[0].totalStar) /
+                  Number(evaluateProduct[0].totalEvaluate)
+              )
+            : 0,
         listStar: {
           oneStar,
           twoStar,
           threeStar,
           fourStar,
-          fiveStar
-        }
-      }
-    })
-  }
-  catch (error) {
+          fiveStar,
+        },
+      },
+    });
+  } catch (error) {
     res.status(500).send({
-      message: "Lỗi server"
-    })
+      message: "Lỗi server",
+    });
   }
-})
+});
 
-router.get('/relate/:id', async (req, res) => {
-
+router.get("/relate/:id", async (req, res) => {
   let id = req.params.id;
   try {
     const productDetail = await ProductModel.findById(id);
 
-    const products = await ProductModel.find({category: productDetail.category})
+    const products = await ProductModel.find({
+      category: productDetail.category,
+    });
 
-    const responseProducts = products.map(product => ({
+    const responseProducts = products.map((product) => ({
       id: product._id,
       name: product.name,
       salePrice: product.salePrice,
       originPrice: product.originPrice,
-      image: product.images[0]
-    }))
+      image: product.images[0],
+    }));
 
     const productIds = products.map((product) => product._id);
 
     const evaluateProducts = await EvaluateModel.aggregate([
       {
-        $match: { product: { $in: productIds } }
+        $match: { product: { $in: productIds } },
       },
       {
         $group: {
           _id: "$product",
           totalEvaluate: { $sum: 1 },
-          totalStar: { $sum: '$numberStar' }
-        }
-      }
+          totalStar: { $sum: "$numberStar" },
+        },
+      },
     ]);
 
-    let result = responseProducts.map(product => {
-      let evaluateItem = evaluateProducts.find(evaluate => String(evaluate._id) === String(product.id));
+    let result = responseProducts.map((product) => {
+      let evaluateItem = evaluateProducts.find(
+        (evaluate) => String(evaluate._id) === String(product.id)
+      );
       if (evaluateItem) {
-        product.star = Math.floor(Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate))
+        product.star = Math.floor(
+          Number(evaluateItem.totalStar) / Number(evaluateItem.totalEvaluate)
+        );
       } else {
-        product.star = 0
+        product.star = 0;
       }
-      return product
-    })
+      return product;
+    });
 
     res.status(200).send({
-      data: result
-    })
-  }
-  catch (error) {
+      data: result,
+    });
+  } catch (error) {
     res.status(500).send({
-      message: "Lỗi server"
-    })
+      message: "Lỗi server",
+    });
   }
-})
+});
 
 module.exports = router;
