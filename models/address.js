@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const addressSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: "user",
     required: true,
   },
   name: String,
@@ -11,10 +11,10 @@ const addressSchema = mongoose.Schema({
   address: String,
   isDefault: {
     type: Boolean,
-    default: false
+    default: false,
   },
-})
+});
 
-const AddressModel = mongoose.model('address', addressSchema);
+const AddressModel = mongoose.model("address", addressSchema);
 
 module.exports = AddressModel;

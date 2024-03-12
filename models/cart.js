@@ -10,7 +10,6 @@ const cartSchema = mongoose.Schema({
   },
   amount: Number,
   time: Date,
-  checked: Boolean,
 });
 
 const CartModel = mongoose.model("cart", cartSchema);

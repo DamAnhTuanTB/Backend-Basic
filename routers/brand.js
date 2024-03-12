@@ -1,90 +1,108 @@
 const express = require("express");
-const auth = require("../middlewares/auth");
+// const auth = require('../middlewares/auth');
 
-// const BrandModel = require('../models/brand');
+const BrandModel = require("../models/brand");
 
 const router = express.Router();
 
-const brand = [
-  {
-    id: 1,
-    image:
-      "https://static.30shine.com/shop-admin/2023/01/03/30SD1L10-b2a8049d1917eff484ec1022f298d9d6_tn.jpg",
-    name: "Nerman",
-  },
-  {
-    id: 2,
-    image:
-      "https://static.30shine.com/shop-admin/2022/12/06/30S6GLDR-30shine.jpg",
-    name: "Nóng cùng mùa bóng",
-  },
-  {
-    id: 3,
-    image:
-      "https://static.30shine.com/shop-admin/2021/12/16/30SBZX2P-halio.png",
-    name: "Halio",
-  },
-  {
-    id: 4,
-    image:
-      "https://static.30shine.com/shop-admin/2021/12/15/30SGZUFA-124238908_865630887511037_1330239005867470293_n.png",
-    name: "Simple",
-  },
-  {
-    id: 5,
-    image:
-      "https://static.30shine.com/shop-admin/2021/11/12/30SA6CYE-logo_opla.png",
-    name: "G.G.G",
-  },
-  {
-    id: 6,
-    image:
-      "https://static.30shine.com/shop-admin/2021/11/12/30SA6CYE-logo_opla.png",
-    name: "G.G.G",
-  },
-  {
-    id: 7,
-    image:
-      "https://static.30shine.com/shop-admin/2023/01/03/30SD1L10-b2a8049d1917eff484ec1022f298d9d6_tn.jpg",
-    name: "Nerman",
-  },
-  {
-    id: 8,
-    image:
-      "https://static.30shine.com/shop-admin/2022/12/06/30S6GLDR-30shine.jpg",
-    name: "Nóng cùng mùa bóng",
-  },
-  {
-    id: 9,
-    image:
-      "https://static.30shine.com/shop-admin/2021/12/16/30SBZX2P-halio.png",
-    name: "Halio",
-  },
-  {
-    id: 10,
-    image:
-      "https://static.30shine.com/shop-admin/2021/12/15/30SGZUFA-124238908_865630887511037_1330239005867470293_n.png",
-    name: "Simple",
-  },
-  {
-    id: 11,
-    image:
-      "https://static.30shine.com/shop-admin/2021/11/12/30SA6CYE-logo_opla.png",
-    name: "G.G.G",
-  },
-  {
-    id: 12,
-    image:
-      "https://static.30shine.com/shop-admin/2021/11/12/30SA6CYE-logo_opla.png",
-    name: "G.G.G",
-  },
-];
-router.use(auth);
+// router.use(auth);
+router.post("/", async (req, res) => {
+  const brandCurrent = await BrandModel.findOne({ name: req.body.name });
 
-router.get("/", (req, res) => {
-  res.status(200).send({
-    brand,
+  if (brandCurrent) {
+    return res.status(400).send({
+      message:
+        "Không được tạo trùng tên thương hiệu. Vui lòng nhập lại tên thương hiệu.",
+    });
+  }
+
+  BrandModel.create({...req.body, createdAt: new Date()}).then((data) => {
+    res.status(201).send({
+      message: "Tạo thương hiệu thành công.",
+    });
   });
 });
+
+router.get("/", async (req, res) => {
+  let { keyword, page, limit, sortDate } = req.query;
+
+  sortDate = Number(sortDate);
+
+  const myPage = page || 1;
+
+  const myLimit = limit || 10;
+
+  const queryBrand = {};
+
+  if (keyword) {
+    queryBrand.name = {
+      $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
+      $options: "i",
+    };
+  }
+
+  const sortDateCondition = {};
+
+  if (sortDate) {
+    sortDateCondition.createdAt = sortDate;
+  }
+
+  const totalBrands = await BrandModel.countDocuments(queryBrand);
+
+  const brands = await BrandModel.find(queryBrand)
+    .sort({ name: 1 })
+    .sort(sortDateCondition)
+    .skip((myPage - 1) * myLimit)
+    .limit(myLimit);
+
+  const result = brands.map((brand) => {
+    return {
+      id: brand._id,
+      name: brand.name,
+      image: brand.image,
+      createdAt: brand.createdAt,
+    };
+  });
+
+  res.status(200).send({
+    data: result,
+    totalBrands,
+    page: Number(myPage),
+    limit: myLimit,
+  });
+});
+
+router.put("/:id", (req, res) => {
+  BrandModel.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
+    .then((data) => {
+      res.status(200).send({ message: "Cập nhật thương hiệu thành công." });
+    })
+    .catch((err) => {
+      res.status(500).send({ message: "Cập nhật thương hiệu thất bại." });
+    });
+});
+
+
+router.delete('/delete-many', async (req, res) => {
+  try{
+    const ids = req.query.idArr;
+    await BrandModel.deleteMany({_id: {$in: ids}});
+    res.status(200).send({message: 'Xóa nhiều thương hiệu thành công.'})
+  }catch(err){
+    res.status(500).send({message: "Xóa nhiều thương hiệu thất bại."})
+  }
+})
+
+router.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  BrandModel.deleteOne({ _id: id })
+    .then(async () => {
+      res.status(200).send({ message: "Xóa thương hiệu thành công." });
+    })
+    .catch((err) =>
+      res.status(500).send({ message: "Xóa thương hiệu thất bại." })
+    );
+});
+
 
 module.exports = router;

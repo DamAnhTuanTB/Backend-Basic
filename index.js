@@ -6,25 +6,22 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const UserModel = require("./models/user");
-const AddressModel = require("./models/address");
-
 const userRouters = require("./routers/user.js");
 const addressRouters = require("./routers/address");
 const productRouters = require("./routers/product");
 const brandRouters = require("./routers/brand");
 const categoryRouters = require("./routers/category");
-const blogRouters = require("./routers/blog");
+
 const evaluateRouters = require("./routers/evaluate");
 const cartRouters = require("./routers/cart");
 const paymentRouters = require("./routers/payment");
 const orderRouters = require("./routers/order");
 const timelineRouters = require("./routers/timeline");
-const adminProductsRouters = require("./routers/productAdmin");
-const adminUserRouters = require("./routers/userAdmin");
+const adminProductsRouters = require("./routers/product.js");
+const adminUserRouters = require("./routers/user.js");
 const adminOrders = require("./routers/orderAdmin");
-const adminBrandRouters = require("./routers/brandAdmin");
-const adminEvaluateRouters = require('./routers/evaluateAdmin')
+const adminBrandRouters = require("./routers/brand.js");
+const adminEvaluateRouters = require("./routers/evaluate.js");
 
 const jwt = require("jsonwebtoken");
 
@@ -191,7 +188,7 @@ app.use("/admin/order", adminOrders);
 
 app.use("/admin/brand", adminBrandRouters);
 
-app.use("/admin/evaluate", adminEvaluateRouters)
+app.use("/admin/evaluate", adminEvaluateRouters);
 
 app.listen(process.env.PORT || 3030, () => {});
 
