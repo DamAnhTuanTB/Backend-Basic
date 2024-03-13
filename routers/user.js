@@ -3,7 +3,7 @@ const express = require("express");
 
 const UserModel = require("../models/user");
 
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
 
 const router = express.Router();
 
@@ -17,12 +17,11 @@ router.post("/", async (req, res) => {
         .status(400)
         .send({ message: "Vui lòng gửi đầy đủ thông tin." });
     }
+    // if (checkUnique) {
+    //   return res.status(400).send(checkUnique);
+    // }
 
-    if (checkUnique) {
-      return res.status(400).send(checkUnique);
-    }
-
-    req.body.password = await bcrypt.hash(req.body.password, 8);
+    // req.body.password = await bcrypt.hash(req.body.password, 8);
 
     UserModel.create(req.body)
       .then(() => {
