@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
     });
   }
 
-  BrandModel.create({...req.body, createdAt: new Date()}).then((data) => {
+  BrandModel.create({ ...req.body, createdAt: new Date() }).then((data) => {
     res.status(201).send({
       message: "Tạo thương hiệu thành công.",
     });
@@ -24,36 +24,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  let { keyword, page, limit, sortDate } = req.query;
-
-  sortDate = Number(sortDate);
-
-  const myPage = page || 1;
-
-  const myLimit = limit || 10;
-
-  const queryBrand = {};
-
-  if (keyword) {
-    queryBrand.name = {
-      $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
-      $options: "i",
-    };
-  }
-
-  const sortDateCondition = {};
-
-  if (sortDate) {
-    sortDateCondition.createdAt = sortDate;
-  }
-
-  const totalBrands = await BrandModel.countDocuments(queryBrand);
-
-  const brands = await BrandModel.find(queryBrand)
-    .sort({ name: 1 })
-    .sort(sortDateCondition)
-    .skip((myPage - 1) * myLimit)
-    .limit(myLimit);
+  const brands = await BrandModel.find().sort({ name: 1 });
 
   const result = brands.map((brand) => {
     return {
@@ -66,11 +37,66 @@ router.get("/", async (req, res) => {
 
   res.status(200).send({
     data: result,
-    totalBrands,
-    page: Number(myPage),
-    limit: myLimit,
   });
 });
+
+router.get("/:id", async (req, res) => {
+  try {
+    const brand = await BrandModel.findById(req.params.id);
+    res.status(200).send(brand);
+  } catch (err) {
+    res.status(500).send({ message: "Lỗi server" });
+  }
+});
+
+// router.get("/", async (req, res) => {
+//   let { keyword, page, limit, sortDate } = req.query;
+
+//   sortDate = Number(sortDate);
+
+//   const myPage = page || 1;
+
+//   const myLimit = limit || 10;
+
+//   const queryBrand = {};
+
+//   if (keyword) {
+//     queryBrand.name = {
+//       $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
+//       $options: "i",
+//     };
+//   }
+
+//   const sortDateCondition = {};
+
+//   if (sortDate) {
+//     sortDateCondition.createdAt = sortDate;
+//   }
+
+//   const totalBrands = await BrandModel.countDocuments(queryBrand);
+
+//   const brands = await BrandModel.find(queryBrand)
+//     .sort({ name: 1 })
+//     .sort(sortDateCondition)
+//     .skip((myPage - 1) * myLimit)
+//     .limit(myLimit);
+
+//   const result = brands.map((brand) => {
+//     return {
+//       id: brand._id,
+//       name: brand.name,
+//       image: brand.image,
+//       createdAt: brand.createdAt,
+//     };
+//   });
+
+//   res.status(200).send({
+//     data: result,
+//     totalBrands,
+//     page: Number(myPage),
+//     limit: myLimit,
+//   });
+// });
 
 router.put("/:id", (req, res) => {
   BrandModel.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
@@ -82,16 +108,15 @@ router.put("/:id", (req, res) => {
     });
 });
 
-
-router.delete('/delete-many', async (req, res) => {
-  try{
+router.delete("/delete-many", async (req, res) => {
+  try {
     const ids = req.query.idArr;
-    await BrandModel.deleteMany({_id: {$in: ids}});
-    res.status(200).send({message: 'Xóa nhiều thương hiệu thành công.'})
-  }catch(err){
-    res.status(500).send({message: "Xóa nhiều thương hiệu thất bại."})
+    await BrandModel.deleteMany({ _id: { $in: ids } });
+    res.status(200).send({ message: "Xóa nhiều thương hiệu thành công." });
+  } catch (err) {
+    res.status(500).send({ message: "Xóa nhiều thương hiệu thất bại." });
   }
-})
+});
 
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
@@ -103,6 +128,5 @@ router.delete("/:id", (req, res) => {
       res.status(500).send({ message: "Xóa thương hiệu thất bại." })
     );
 });
-
 
 module.exports = router;

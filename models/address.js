@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const addressSchema = mongoose.Schema({
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
     required: true,

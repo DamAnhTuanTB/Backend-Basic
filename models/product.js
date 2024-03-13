@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const productSchema = mongoose.Schema({
-  brand: {
+  brandId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "brand",
   },
-  category: {
+  categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "category",
   },

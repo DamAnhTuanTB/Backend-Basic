@@ -38,27 +38,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  let { keyword, page, limit, sort } = req.query;
-
-  const myPage = page || 1;
-
-  const myLimit = limit || 10;
-
-  const queryUser = { role: { $ne: "admin" } };
-
-  if (keyword) {
-    queryUser.name = {
-      $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
-      $options: "i",
-    };
-  }
-
-  const totalUsers = await UserModel.countDocuments(queryUser);
-
-  const startIndex = (myPage - 1) * myLimit;
-  const endIndex = startIndex + myLimit;
-
-  const users = await UserModel.find(queryUser).sort({ name: 1 });
+  const users = await UserModel.find().sort({ name: 1 });
 
   const result = users.map((user) => {
     return {
@@ -72,11 +52,71 @@ router.get("/", async (req, res) => {
   });
 
   res.status(200).send({
-    data: result.slice(startIndex, endIndex),
-    totalUsers,
-    page: Number(myPage),
-    limit: myLimit,
+    data: result,
   });
+
+  //
+  router.get("/:id", async (req, res) => {
+    try {
+      const user = await UserModel.findById(req.params.id);
+      if (!user) {
+        return res.status(404).send({ message: "Không tìm thấy người dùng." });
+      }
+      const userData = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        date: user.date,
+        telephone: user.telephone,
+        gender: user.gender,
+      };
+      res.status(200).send({ data: userData });
+    } catch (error) {
+      res.status(500).send({ message: "Lỗi server." });
+    }
+  });
+
+  // router.get('/:id', async (req, res) => {})
+
+  // let { keyword, page, limit, sort } = req.query;
+
+  // const myPage = page || 1;
+
+  // const myLimit = limit || 10;
+
+  // const queryUser = { role: { $ne: "admin" } };
+
+  // if (keyword) {
+  //   queryUser.name = {
+  //     $regex: keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
+  //     $options: "i",
+  //   };
+  // }
+
+  // const totalUsers = await UserModel.countDocuments(queryUser);
+
+  // const startIndex = (myPage - 1) * myLimit;
+  // const endIndex = startIndex + myLimit;
+
+  // const users = await UserModel.find(queryUser).sort({ name: 1 });
+
+  // const result = users.map((user) => {
+  //   return {
+  //     id: user._id,
+  //     name: user.name,
+  //     email: user.email,
+  //     date: user.date,
+  //     telephone: user.telephone,
+  //     gender: user.gender,
+  //   };
+  // });
+
+  // res.status(200).send({
+  //   data: result.slice(startIndex, endIndex),
+  //   totalUsers,
+  //   page: Number(myPage),
+  //   limit: myLimit,
+  // });
 });
 
 router.put("/:id", (req, res) => {

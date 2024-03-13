@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const { boolean } = require('webidl-conversions');
 const evaluateSchema = mongoose.Schema({
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
-  product: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'product'
   },
